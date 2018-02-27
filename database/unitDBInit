@@ -1,0 +1,23 @@
+create database if not exists plannerDB;
+
+create table if not exists plannerDB.Units (
+  unitId int primary key auto_increment,
+  unit varChar (30)),
+
+);
+create table if not exists plannerDB.Weeks (
+  weekId int primary key auto_increment,
+  weekName varChar (30)),
+  CONSTRAINT 
+
+);
+create table if not exists plannerDB.Units (
+  id int primary key auto_increment,
+  unit varChar (30)),
+
+);
+create table if not exists plannerDB.Units (
+  id int primary key auto_increment,
+  unit varChar (30)),
+
+);

@@ -2,6 +2,11 @@ body{
   background-color: #fffff;
 
 }
+
+[draggable] {
+  user-select: none;
+}
+
 .wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -36,7 +41,7 @@ body{
 }
 
 
-.unitBlock > ul{
+.unitBlock > ol{
 
   height: 80%;
   list-style: none;
@@ -48,7 +53,62 @@ body{
   border-color: black;
 }
 
-.unitBlock > ul >li{
+.unitBlock > ol >li{
 border: 1px solid black;
 padding: 8px;
+}
+.unitBlock > ol > li{
+  counter-increment: item;
+  max-resolution: 5px;
+
+}
+.unitBlock > ol > li:before{
+  margin-right: 10px;
+content: counter(item);
+background: lightblue;
+border-radius: 100%;
+color: white;
+width: 1.2em;
+text-align: center;
+display: inline-block;
+
+}
+details{
+
+
+}
+
+summary::-webkit-details-marker{
+  display: none;
+}
+summary:after{
+  float: right;
+  margin:-2px 10px 0 -100px;
+  font-size: 1.5em;
+  font-weight: bold;
+  content: "+";
+}
+
+
+
+.week.dragElem {
+  opacity: 0.4;
+}
+.week.over {
+  //border: 2px dashed #000;
+  border-top: 2px solid blue;
+}
+
+
+
+
+
+
+
+details[open] summary:after{
+  content:"-";
+}
+
+details[open] summary{
+  background-color: #9ec3ff;
 }
