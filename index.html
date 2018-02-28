@@ -4,11 +4,14 @@
   <link rel="stylesheet" type="text/css" href="css.css">
   <body>
     <div class = "wrapper">
-      <div class = "unitBlock">this is a test unit 2
+      <div class = "unitBlock">
+        <p>this is a test unit</p>
+
+
         <ol id = "weeks">
           <li class='week' draggable="true">
             <details id = "weekDetail" data-memostate = "open"> <!--increment by 1-->
-              <summary> Week 1 - topic a </summary>
+              <summary>topic a</summary>
                 <ul>
                   <li>A</li>
                   <li>B</li>      <!--pull from DB week details-->
@@ -16,18 +19,23 @@
                   <li draggable="true">D</li>
                 </ul>
             </details>
+            <a class ="delete" data-id = "1">X</a>
           </li>
 
-        <li class='week' draggable="true"><summary>week2 - topic b</summary></li>
-        <li class='week' draggable="true"><summary>week3 - topic 3</summary></li> <!--if no content set to "-" -->
+        <li class='week' draggable="true"><summary>topic b</summary> <a class ="delete" data-id = "2">X</a> </li>
+
+
+        <li class='week' draggable="true"><summary>topic C</summary>  <a class ="delete" data-id = "3">X</a> </li>
+
+            <!--if no content set to "-" -->
         </ul>
 
       </div>
       <div class = "unitBlock">this is a test unit 3
         <ul class = "weekBlock">
-          <li><summary>week1 - topic a</summary></li>
-          <li><summary>week2 - topic b</summary></li>
-          <li><summary>week3 - topic 3</summary></li>
+          <li><summary>topic a</summary></li>
+          <li><summary>topic b</summary></li>
+          <li><summary>topic c</summary></li>
         </ul>
       </div>  <!--make so pulls from a DB , and number the divs  -->
       <div class = "unitBlock">this is a test unit 4</div>
