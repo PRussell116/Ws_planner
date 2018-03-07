@@ -17,13 +17,54 @@ function init() {
 
 }
 function deleteWeek(e){
+  console.log("delete event start")
   selectedEle = this;
-  if(window.confirm("Are you sure you want to delete " + this.parentNode.firstChild.innerText)){
-    selectedEle.parentElement.remove(this);
-  }
+
+
+
+  let confirmBoxContain = document.createElement("section")
+  confirmBoxContain.setAttribute("class","decisonContainer")
+
+
+  let yesBox = document.createElement("p");
+  yesBox.innerText = "yes"
+  yesBox.setAttribute("class","decisonBox");
+
+  let noBox = document.createElement("p");
+  noBox.innerText = "no"
+  noBox.setAttribute("class","decisonBox");
+
+  confirmBoxContain.appendChild(yesBox);
+  confirmBoxContain.appendChild(noBox);
+
+  //
+   yesBox.addEventListener('click',yesNoHandler);
+   noBox.addEventListener('click',yesNoHandler);
+
+  this.parentNode.appendChild(confirmBoxContain);
+
+
+//  if(window.confirm("Are you sure you want to delete " + this.parentNode.firstChild.innerText)){  // change to html, confirm box not cool
+  //  selectedEle.parentElement.remove(this);
+  //}
   // else dont do anything
 }
 
+
+// this si horrible change this
+
+ function yesNoHandler(e){
+   selectedEle = this;
+  if (selectedEle.innerText == "yes"){
+    selectedEle.parentNode.parentNode.parentNode.removeChild(selectedEle.parentNode.parentNode); // remove the week from the dom
+   }
+   else{
+     console.log("selected ele : " + selectedEle);
+     console.log("par1 : " + selectedEle.parentNode);
+     console.log("par 2 : " + selectedEle.parentNode.parentNode)
+    selectedEle.parentNode.parentNode.removeChild(selectedEle.parentNode); // delete the yes / no box container when done
+   }
+}
 
 
 let selectedEle = null;
@@ -59,6 +100,9 @@ function handleDrop(e) {
     let dropHTML = e.dataTransfer.getData('text/html');
     this.insertAdjacentHTML('beforeBegin', dropHTML);
     let dropElem = this.previousSibling;
+    console.log(dropElem);
+    let innerDeletes = dropElem.getElementsByClassName('delete')
+    innerDeletes[0].addEventListener('click',deleteWeek);
     addDragDropHandlers(dropElem);
   }
   this.classList.remove('over');
@@ -70,6 +114,9 @@ function handleDragEnd(e) {
   this.classList.remove('over');
 
 }
+
+
+
 
 function addDragDropHandlers(elem) {
   elem.addEventListener('dragstart', handleDragStart, false);

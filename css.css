@@ -114,7 +114,7 @@ summary:after{
   opacity: 0.4;
 }
 .week.over {
-  //border: 2px dashed #000;
+  border: 2px dashed #000;
   border-top: 2px solid blue;
 }
 
@@ -124,4 +124,23 @@ details[open] summary:after{
 
 details[open] summary{
   background-color: #9ec3ff;
+}
+
+.decisonBoxContainer{
+  border-style: solid;
+
+
+}
+
+.decisonBox{
+  border-style: solid;
+  padding:none;
+  margin: none;
+  font-size: 1em;
+  text-align: center;
+  width: 50%
+
+
+
+
 }
