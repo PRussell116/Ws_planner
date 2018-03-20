@@ -1,0 +1,30 @@
+{
+  "name": "ws_planner",
+  "version": "1.0.0",
+  "description": "a lecture planner",
+  "main": "server.js",
+  "scripts": {
+    "test": "start",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PRussell116/Ws_planner.git"
+  },
+  "keywords": [
+    "planner",
+    "webscripot"
+  ],
+  "author": "806925",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PRussell116/Ws_planner/issues"
+  },
+  "homepage": "https://github.com/PRussell116/Ws_planner#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "http": "0.0.0",
+    "ip": "^1.1.5",
+    "ws": "^5.1.0"
+  }
+}
