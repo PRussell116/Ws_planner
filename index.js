@@ -22,6 +22,7 @@ function deleteWeek(e){
 
 
 
+
   let confirmBoxContain = document.createElement("section")
   confirmBoxContain.setAttribute("class","decisonContainer")
 
@@ -43,7 +44,8 @@ function deleteWeek(e){
 
   this.parentNode.appendChild(confirmBoxContain);
 
-
+  console.log(selectedEle);
+  selectedEle.removeEventListener('click',deleteWeek);
 //  if(window.confirm("Are you sure you want to delete " + this.parentNode.firstChild.innerText)){  // change to html, confirm box not cool
   //  selectedEle.parentElement.remove(this);
   //}
@@ -55,14 +57,14 @@ function deleteWeek(e){
 
  function yesNoHandler(e){
    selectedEle = this;
+   let week = selectedEle.parentNode.parentNode;
   if (selectedEle.innerText == "yes"){
-    selectedEle.parentNode.parentNode.parentNode.removeChild(selectedEle.parentNode.parentNode); // remove the week from the dom
+    week.parentNode.removeChild(week); // remove the week from the dom
    }
    else{
-     console.log("selected ele : " + selectedEle);
-     console.log("par1 : " + selectedEle.parentNode);
-     console.log("par 2 : " + selectedEle.parentNode.parentNode)
-    selectedEle.parentNode.parentNode.removeChild(selectedEle.parentNode); // delete the yes / no box container when done
+     week.querySelector(".delete").addEventListener('click',deleteWeek);// readd event listner to delete button
+     week.removeChild(selectedEle.parentNode); // delete the yes / no box container when done
+
    }
 }
 

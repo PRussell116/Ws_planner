@@ -127,20 +127,27 @@ details[open] summary{
 }
 
 .decisonBoxContainer{
+  display: flex;
+  flex-drection:row;
   border-style: solid;
+/*  overflow: hidden;*/
+
 
 
 }
 
 .decisonBox{
-  border-style: solid;
+  flex:auto;
+  /*border-style: solid;
   padding:none;
   margin: none;
   font-size: 1em;
   text-align: center;
-  width: 50%
-
-
-
-
+  width: 25%*/
 }
+/*.left{
+  float: left;
+}
+.right{
+  float: right;
+}*/
