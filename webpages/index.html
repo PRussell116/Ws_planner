@@ -7,20 +7,20 @@
       <div class = "unitBlock">
         <p>this is a test unit</p>
         <ol id = "weeks">
-          <li class='week' draggable="true">
+          <li class='week' draggable="true" id="week1">
             <details id = "weekDetail" data-memostate = "open"> <!--increment by 1-->
               <summary>topic a</summary>
                 <ul>
-                  <li>A</li>
-                  <li>B</li>      <!--pull from DB week details-->
-                  <li draggable="true">C</li>
-                  <li draggable="true">D</li>
+                  <li class = 'resource' draggable="true" id = "week1Resource1">A<a class = 'delete'>X</a></li>
+                  <li class = 'resource' draggable="true" id = "week1Resource2">B<a class = 'delete'>X</a></li>      <!--pull from DB week details-->
+                  <li class = 'resource' draggable="true" id = "week1Resource3">C<a class = 'delete'>X</a></li>
+                  <li class = 'resource' draggable="true" id = "week1Resource4">D<a class = 'delete'>X</a></li>
                 </ul>
             </details>
             <a class ="delete" id= "del1">X</a>
           </li>
-        <li class='week' draggable="true"><summary>topic b</summary> <a class ="delete" id = "del2">X</a> </li>
-        <li class='week' draggable="true"><summary>topic C</summary>  <a class ="delete" id = "del3">X</a> </li>
+        <li class='week' draggable="true" id ="week2"><summary>topic b</summary> <a class ="delete" id = "del2">X</a> </li>
+        <li class='week' draggable="true" id = "week3"><summary>topic C</summary>  <a class ="delete" id = "del3">X</a> </li>
             <!--if no content set to "-" -->
         </ul>
       </div>

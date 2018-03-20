@@ -2,9 +2,7 @@
 console.log("connected");
 window.addEventListener('load', init);
 let ws = new WebSocket("ws://" + window.location.hostname + ":" + (window.location.port || 80) + "/");
-ws.onmessage = function (event) {
-  console.log(event.data);
-}
+ws.addEventListener("message",recivedMessageFromServer);
 
 
 function init() {
@@ -18,7 +16,7 @@ function init() {
   for(let i = 0;i<deleteButts.length;i++){
     deleteButts[i].addEventListener('click',deleteWeek);
 
-    ws.send("message");
+
   }
 
 
@@ -63,17 +61,42 @@ function deleteWeek(e){
 // this si horrible change this
 
  function yesNoHandler(e){
-   selectedEle = this;
-   let week = selectedEle.parentNode.parentNode;
-  if (selectedEle.innerText == "yes"){
-    week.parentNode.removeChild(week); // remove the week from the dom
+    selectedEle = this;
+    let elementToDelete = selectedEle.parentNode.parentNode;
+    if (selectedEle.innerText == "yes"){
+    // tell server to delete
+    ws.send(
+      JSON.stringify ({
+        'method' : 'delete',
+        'element' : elementToDelete.getAttribute('id')
+      }));
    }
    else{
-     week.querySelector(".delete").addEventListener('click',deleteWeek);// readd event listner to delete button
-     week.removeChild(selectedEle.parentNode); // delete the yes / no box container when done
+     // delete the yes / no box
+     elementToDelete.querySelector(".delete").addEventListener('click',deleteWeek);// readd event listner to delete button
+     elementToDelete.removeChild(selectedEle.parentNode); // delete the yes / no box container when done
 
    }
 }
+
+
+function deleteElement(eleID){
+  let ele = document.getElementById(eleID);
+  ele.parentNode.removeChild(ele);
+}
+
+function recivedMessageFromServer(e){
+  const recived = JSON.parse(e.data);
+  if (recived.method = "delete"){
+    deleteElement(recived.element);
+  }
+  else if(recived.method == "addElement"){
+    addElement(recived.element);
+  }
+
+
+}
+
 
 
 let selectedEle = null;

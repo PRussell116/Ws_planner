@@ -49,7 +49,7 @@ body{
     visibility: hidden; /* hidden elements don't register clicks */
     transition: opacity 0.3s, visibility 0s;
 }
-li:hover .delete {
+li:hover > .delete {
 
   opacity: 1;
  visibility: visible;

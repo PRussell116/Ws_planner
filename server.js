@@ -22,6 +22,13 @@ function connectionHandler(ws){
 
 function messageHandler(message){
   console.log('received: %s', message);
+  let msgJson = JSON.parse(message);
+  if(msgJson.method == 'delete'){
+    // remove from DB
+    // change message to tell clients to delete
+
+  }
+  // forward message to clients
   wss.clients.forEach((client)=>{
     if(client.readyState === client.OPEN){
       try{
