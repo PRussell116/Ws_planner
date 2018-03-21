@@ -55,7 +55,28 @@ li:hover > .delete {
  visibility: visible;
  transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
 }
+.save{
+  border-style: solid;
+}
 
+
+.add{
+    color: green;
+    display: block;
+    opacity: 0;
+    visibility: hidden; /* hidden elements don't register clicks */
+    transition: opacity 0.3s, visibility 0s;
+}
+li:hover > .add {
+
+  opacity: 1;
+ visibility: visible;
+ transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
+}
+
+#weekAdd{
+  
+}
 
 
 .unitBlock > ol{

@@ -15,8 +15,11 @@ function init() {
   const deleteButts = document.getElementsByClassName('delete');
   for(let i = 0;i<deleteButts.length;i++){
     deleteButts[i].addEventListener('click',deleteWeek);
+  }
 
-
+  const addButts = document.getElementsByClassName('add');
+  for(let i = 0;i<addButts.length;i++){
+    addButts[i].addEventListener('click',addWeekInputs);
   }
 
 
@@ -25,12 +28,8 @@ function deleteWeek(e){
   console.log("delete event start")
   selectedEle = this;
 
-
-
-
-  let confirmBoxContain = document.createElement("section")
-  confirmBoxContain.setAttribute("class","decisonContainer")
-
+  let confirmBoxContain = document.createElement("section");
+  confirmBoxContain.setAttribute("class","decisonContainer");
 
   let yesBox = document.createElement("p");
   yesBox.innerText = "yes"
@@ -43,22 +42,90 @@ function deleteWeek(e){
   confirmBoxContain.appendChild(yesBox);
   confirmBoxContain.appendChild(noBox);
 
-  //
    yesBox.addEventListener('click',yesNoHandler);
    noBox.addEventListener('click',yesNoHandler);
 
   this.parentNode.appendChild(confirmBoxContain);
 
-  console.log(selectedEle);
+
   selectedEle.removeEventListener('click',deleteWeek);
-//  if(window.confirm("Are you sure you want to delete " + this.parentNode.firstChild.innerText)){  // change to html, confirm box not cool
-  //  selectedEle.parentElement.remove(this);
-  //}
-  // else dont do anything
 }
 
 
-// this si horrible change this
+function addWeekInputs(e){
+  console.log("add week event started");
+
+  let addBox = document.createElement('article');
+
+  let weekToAddTo = document.createElement('p');
+  weekToAddTo.innerText = this.parentNode.id; // gets the week
+  weekToAddTo.setAttribute('id',"weekAdd");
+
+  let weekTitleBox = document.createElement('input');
+  weekTitleBox.type = "text";
+  weekTitleBox.innerText = "week title";
+  weekTitleBox.setAttribute('id',"titleBox");
+
+  let weekTitleText = document.createElement('p');
+  weekTitleText.innerText = "Title:"
+
+
+  let durationText = document.createElement('p')
+  durationText.innerText = "Duration:"
+
+  let durationBox = document.createElement('input');
+  durationBox.type = "number";
+  durationBox.innerText = "duration";
+  durationBox.setAttribute('id',"duration");
+
+  let saveBox = document.createElement('p')
+  saveBox.classList.add('save');
+  saveBox.innerText = "Save";
+  saveBox.addEventListener('click',saveHandler);
+
+  let cancelBox = document.createElement('p');
+  cancelBox.classList.add('cancel');
+  cancelBox.innerText = "cancel";
+  cancelBox.addEventListener('click',cancelHandler);
+
+  addBox.appendChild(weekToAddTo);
+  addBox.appendChild(weekTitleText);
+  addBox.appendChild(weekTitleBox);
+  addBox.appendChild(durationText);
+  addBox.appendChild(durationBox);
+  addBox.appendChild(saveBox);
+  addBox.appendChild(cancelBox);
+  addBox.setAttribute('id',"addWeekBox");
+
+  document.querySelector('.wrapper').appendChild(addBox);
+  this.removeEventListener('click',addWeekInputs);
+
+}
+
+function saveHandler(e){
+  // get content from boxes
+  let weekToAddTo = document.getElementById('weekAdd');
+  let title = document.getElementById('titleBox').value;
+  let duration = document.getElementById('duration').value;
+  ws.send(
+    JSON.stringify ({
+      'method'  : 'save',
+      'element' : weekToAddTo.innerText,
+      'title'   : title,
+      'duration': duration
+    }));
+
+     document.getElementById('addWeekBox').remove();
+     // re-add the event listener to the + button
+     document.getElementById(weekToAddTo.innerText).querySelector('.add').addEventListener('click',addWeekInputs);
+
+ }
+
+// after clicking cancel the box is removed
+function cancelHandler(e){
+   document.getElementById('addWeekBox') .remove();
+}
+
 
  function yesNoHandler(e){
     selectedEle = this;
@@ -81,17 +148,33 @@ function deleteWeek(e){
 
 
 function deleteElement(eleID){
-  let ele = document.getElementById(eleID);
-  ele.parentNode.removeChild(ele);
+  document.getElementById(eleID).remove();
+}
+
+function addWeekToPage(prevEle,title,duration){
+
+  const template = document.querySelector('#week_t');
+  const newEl = document.importNode(template.content,true).children[0];
+
+  newEl.querySelectorAll('.delete').forEach((button)=>{
+    button.addEventListener('click',deleteWeek);
+  });
+  newEl.querySelector('details > summary').innerText = title;
+
+  addDragDropHandlers(newEl);
+
+  document.getElementById(prevEle).insertAdjacentElement('afterEnd',newEl);
+  // do something with duration
+
 }
 
 function recivedMessageFromServer(e){
   const recived = JSON.parse(e.data);
-  if (recived.method = "delete"){
+  if (recived.method == "delete"){
     deleteElement(recived.element);
   }
-  else if(recived.method == "addElement"){
-    addElement(recived.element);
+  else if(recived.method == "save"){
+    addWeekToPage(recived.element,recived.title,recived.duration);
   }
 
 
@@ -100,6 +183,14 @@ function recivedMessageFromServer(e){
 
 
 let selectedEle = null;
+
+/*
+
+    Drag and drop handlers 👇
+
+
+
+*/
 
 function handleDragStart(e) {
   selectedEle = this;
@@ -132,9 +223,11 @@ function handleDrop(e) {
     let dropHTML = e.dataTransfer.getData('text/html');
     this.insertAdjacentHTML('beforeBegin', dropHTML);
     let dropElem = this.previousSibling;
-    console.log(dropElem);
-    let innerDeletes = dropElem.getElementsByClassName('delete')
-    innerDeletes[0].addEventListener('click',deleteWeek);
+    let innerDeletes = dropElem.getElementsByClassName('delete');
+    // readd event listners
+    for(let i = 0;i<innerDeletes.length;i++){
+      innerDeletes[i].addEventListener('click',deleteWeek);
+    }
     addDragDropHandlers(dropElem);
   }
   this.classList.remove('over');

@@ -1,7 +1,11 @@
 <!doctype html>
 <html>
-  <title>Unit Planner</title>
-  <link rel="stylesheet" type="text/css" href="css.css">
+
+<head>
+    <title>Unit Planner</title>
+    <link rel="stylesheet" type="text/css" href="css.css">
+    <script src="index.js"></script>
+</head>
   <body>
     <div class = "wrapper">
       <div class = "unitBlock">
@@ -17,14 +21,65 @@
                   <li class = 'resource' draggable="true" id = "week1Resource4">D<a class = 'delete'>X</a></li>
                 </ul>
             </details>
-            <a class ="delete" id= "del1">X</a>
+            <a class ="delete">X</a>
+            <a class = "add">ZZZZZZZ</a>
           </li>
-        <li class='week' draggable="true" id ="week2"><summary>topic b</summary> <a class ="delete" id = "del2">X</a> </li>
-        <li class='week' draggable="true" id = "week3"><summary>topic C</summary>  <a class ="delete" id = "del3">X</a> </li>
+
+
+
+
+        <li class='week' draggable="true" id ="week2">
+          <details id = "weekDetail2" data-memostate = "open">
+            <summary>topic b</summary>
+              <ul>
+                <li class = 'resource' draggable="true" id = "week2Resource1">A<a class = 'delete'>X</a></li>
+                <li class = 'resource' draggable="true" id = "week2Resource2">B<a class = 'delete'>X</a></li>      <!--pull from DB week details-->
+                <li class = 'resource' draggable="true" id = "week2Resource3">C<a class = 'delete'>X</a></li>
+                <li class = 'resource' draggable="true" id = "week2Resource4">D<a class = 'delete'>X</a></li>
+              </ul>
+            </details>
+            <a class ="delete">X</a>
+            <a class = "add">+</a>
+          </li>
+
+
+
+        <li class='week' draggable="true" id = "week3">
+
+          <details id = "weekDetail3" data-memostate = "open">
+            <summary>topic C</summary>
+              <ul>
+                <li class = 'resource' draggable="true" id = "week3Resource1">A<a class = 'delete'>X</a></li>
+                <li class = 'resource' draggable="true" id = "week3Resource2">B<a class = 'delete'>X</a></li>      <!--pull from DB week details-->
+                <li class = 'resource' draggable="true" id = "week3Resource3">C<a class = 'delete'>X</a></li>
+                <li class = 'resource' draggable="true" id = "week3Resource4">D<a class = 'delete'>X</a></li>
+              </ul>
+          </details>
+          <a class ="delete">X</a>
+          <a class = "add">+</a>
+        </li>
             <!--if no content set to "-" -->
-        </ul>
+          </ol>
       </div>
+    </div>
+   <template id = "week_t">
+      <li class = 'week' draggable= "true" id = "error">
+          <details id = "error" data-memostate = "open">
+            <summary>error</summary>
+            <ul>
+              <li class = 'resource' draggable="true" id = "error">
+                <a class = 'delete'>X</a>
+              </li>
+            </ul>
+          </details>
+          <a class = "delete">X</a>
+          <a class = "add">+</a>
+      </li>
+    </template>
+
+
+
 </html>
-<script src="index.js"></script>
+
 
 <!-- details summaries-->

@@ -19,7 +19,7 @@ function connectionHandler(ws){
   ws.on('message',messageHandler)
 
 }
-
+// combo with fetches
 function messageHandler(message){
   console.log('received: %s', message);
   let msgJson = JSON.parse(message);
@@ -28,6 +28,12 @@ function messageHandler(message){
     // change message to tell clients to delete
 
   }
+  else if(msgJson.method == 'save'){
+    // add to DB
+
+  }
+
+
   // forward message to clients
   wss.clients.forEach((client)=>{
     if(client.readyState === client.OPEN){
