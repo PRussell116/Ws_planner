@@ -1,23 +1,45 @@
 create database if not exists plannerDB;
 
-create table if not exists plannerDB.Units (
+create table if not exists plannerDB.Unit(
   unitId int primary key auto_increment,
-  unit varChar (30)),
-
+  unitName varChar(30)
 );
-create table if not exists plannerDB.Weeks (
+
+
+create table if not exists plannerDB.Week (
   weekId int primary key auto_increment,
-  weekName varChar (30)),
-  CONSTRAINT 
+  weekName varChar (30),
+  duration int,
+  unitId int,
+
+  foreign key (unitId) references Unit(unitId) on delete cascade
+);
+
+
+
+create table if not exists plannerDB.WeekResources (
+  resourceId int primary key auto_increment,
+  WeekId int,
+  file BLOB,
+  foreign key (weekID) references Week(weekId) on delete cascade
 
 );
-create table if not exists plannerDB.Units (
-  id int primary key auto_increment,
-  unit varChar (30)),
 
-);
-create table if not exists plannerDB.Units (
-  id int primary key auto_increment,
-  unit varChar (30)),
+-- test data
 
-);
+insert into plannerDB.Unit values(null,"Fake Unit1");
+insert into plannerDB.Week values(null,"Fake Week1: security",1,1);
+insert into plannerDB.Week values(null,"Fake Week2: lit review",2,1);
+insert into plannerDB.Week values(null,"Fake Week3: ",1,1);
+
+
+insert into plannerDB.Unit values(null,"Fake Unit2");
+insert into plannerDB.Week values(null,"Fake Week1: javascript",1,2);
+insert into plannerDB.Week values(null,"Fake Week2:  dom",1,2);
+insert into plannerDB.Week values(null,"Fake Week3:  css",3,2);
+
+
+insert into plannerDB.Unit values(null,"Fake Unit3");
+insert into plannerDB.Week values(null,"Fake Week1: cheese",1,3);
+insert into plannerDB.Week values(null,"Fake Week2: chocolate",1,3);
+insert into plannerDB.Week values(null,"Fake Week3: bacon",4,3);

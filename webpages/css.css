@@ -1,6 +1,5 @@
-body{
+body {
   background-color: #fffff;
-
 }
 
 [draggable] {
@@ -11,21 +10,20 @@ body{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 4vh;
-  padding:4vh;
+  padding: 4vh;
   grid-auto-rows: minmax(50vh, auto);
 }
 
-.unitBlock{
+.unit {}
+
+.unitBlock {
   background-color: #444;
-  color:white;
-  border-radius:5px;
+  color: white;
+  border-radius: 5px;
   border-color: black;
   padding: 20px;
-
-
-/* hover animation*/
+  /* hover animation*/
   display: inline-block;
-
   vertical-align: middle;
   -webkit-transform: perspective(1px) translateZ(0);
   transform: perspective(1px) translateZ(0);
@@ -34,131 +32,161 @@ body{
   transition-duration: 0.3s;
   -webkit-transition-property: box-shadow;
   transition-property: box-shadow;
+  z-index: 0;
 }
 
 .unitBlock:hover, .unitBlock:focus, .unitBlock:active {
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
 }
 
-
-
-.delete{
-    color: red;
-    display: block;
-    opacity: 0;
-    visibility: hidden; /* hidden elements don't register clicks */
-    transition: opacity 0.3s, visibility 0s;
+.delete {
+  color: red;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  /* hidden elements don't register clicks */
+  transition: opacity 0.3s, visibility 0s;
 }
-li:hover > .delete {
 
+li:hover>.delete {
   opacity: 1;
- visibility: visible;
- transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
+  visibility: visible;
+  transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
 }
-.save{
+
+.save {
   border-style: solid;
 }
 
-
-.add{
-    color: green;
-    display: block;
-    opacity: 0;
-    visibility: hidden; /* hidden elements don't register clicks */
-    transition: opacity 0.3s, visibility 0s;
+.hidden {
+  visibility: hidden;
 }
-li:hover > .add {
 
+nav {
+  z-index: 1;
+  position: fixed;
+  top: 0px;
+  background: black;
+  width: 100%;
+  height: 5%
+}
+
+nav ul, nav li {
+  margin: 0;
+  padding: 0;
+}
+
+nav ul {
+  background: black;
+  list-style: none;
+  width: 100%;
+}
+
+nav li {
+  float: left;
+  position: relative;
+  width: auto;
+}
+
+nav a {
+  background: black;
+  color: white;
+  display: block;
+  font: bold 1em sans-serif;
+  padding: 0.5em 2em;
+  text-align: center;
+  text-decoration: none;
+}
+
+.add {
+  color: green;
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  /* hidden elements don't register clicks */
+  transition: opacity 0.3s, visibility 0s;
+}
+
+li:hover>.add {
   opacity: 1;
- visibility: visible;
- transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
+  visibility: visible;
+  transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
 }
 
-#weekAdd{
-  
-}
+#weekAdd {}
 
-
-.unitBlock > ol{
-
+.unitBlock>ol {
   height: 80%;
   list-style: none;
   padding-left: 0;
-
   background-color: white;
-  color:black;
-  border-radius:5px;
-
+  color: black;
+  border-radius: 5px;
   border-color: black;
 }
 
-.unitBlock > ol >li{
-border: 1px solid black;
-padding: 8px;
+.unitBlock>ol>li {
+  border: 1px solid black;
+  padding: 8px;
   padding-bottom: 5em;
 }
-.unitBlock > ol > li{
+
+.unitBlock>ol>li {
   counter-increment: item;
   max-resolution: 5px;
-
 }
-.unitBlock > ol > li:before{
+
+.unitBlock>ol>li:before {
   margin-right: 10px;
-content: counter(item);
-background: lightblue;
-border-radius: 100%;
-color: white;
-width: 1.2em;
-text-align: center;
-display: inline-block;
-
-}
-details{
-
-
+  content: counter(item);
+  background: lightblue;
+  border-radius: 100%;
+  color: white;
+  width: 1.2em;
+  text-align: center;
+  display: inline-block;
 }
 
-summary::-webkit-details-marker{
+details {}
+
+summary::-webkit-details-marker {
   display: none;
 }
-summary:after{
+
+summary:after {
   float: right;
-  margin:-2px 10px 0 -100px;
+  margin: -2px 10px 0 -100px;
   font-size: 1.5em;
   font-weight: bold;
   content: "+";
 }
 
-
-
 .week.dragElem {
   opacity: 0.4;
 }
+
 .week.over {
   border: 2px dashed #000;
   border-top: 2px solid blue;
 }
 
-details[open] summary:after{
-  content:"-";
+details[open] summary:after {
+  content: "-";
 }
 
-details[open] summary{
+details[open] summary {
   background-color: #9ec3ff;
 }
 
-.decisonBoxContainer{
+.decisonBoxContainer {
   display: flex;
-  flex-drection:row;
+  flex-drection: row;
   border-style: solid;
-/*  overflow: hidden;*/
-
-
-
+  /*  overflow: hidden;*/
 }
 
-.decisonBox{
-  flex:auto;
+.decisonBox {
+  flex: auto;
   /*border-style: solid;
   padding:none;
   margin: none;
@@ -166,6 +194,7 @@ details[open] summary{
   text-align: center;
   width: 25%*/
 }
+
 /*.left{
   float: left;
 }
