@@ -10,7 +10,10 @@
 <body>
   <nav>
     <ul id="unitsBar">
+      <li><a id = 'unitAdd'>+</a></li>
+
     </ul>
+
   </nav>
   <div class="wrapper">
 
@@ -18,6 +21,7 @@
       <article>
         <p id='currentUnit'></p>
         <p id='currentUnitId' class='hidden'></p>
+
       </article>
       <ol id="weeks">
         <li class='week' draggable="true" id="week1">
@@ -71,7 +75,7 @@
           <a class="delete">X</a>
           <a class="add">+</a>
         </li>
-        <!--if no content set to "-" -->
+
       </ol>
     </div>
   </div>
@@ -97,6 +101,18 @@
         <a class = "delete">X</a>
       </li>
     </template>
+
+
+
+   <template id="unitInput_t">
+    <li>
+     <article>
+       <input type = "text" placeholder = "Enter name of unit"></input>
+       <p class = 'save'>Save</p>
+       <p class = 'cancel'>Cancel</p>
+     </article>
+   </li>
+   </template>
 
 
 </html>

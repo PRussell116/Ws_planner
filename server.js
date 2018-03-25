@@ -48,23 +48,37 @@ async function messageHandler(message, res) {
     }
   } else if (msgJson.method == 'save') {
     // add to DB
-    const newWeekData = {
-      weekName: msgJson.title,
-      duration: msgJson.duration,
-      unitId: msgJson.unit
-    };
+    if(msgJson.type == "unit"){
+      await sql.query(sql.format('INSERT INTO Unit VALUES ( NULL,  \"' + msgJson.title + "\" )" ));
+        let [unitId] = await sql.query('SELECT unitId FROM Unit WHERE unitName LIKE  \"' + msgJson.title + "\" ");
+        let newId = unitId[0].unitId;
+        message = JSON.stringify({'method': 'save',
+        'type'  : "unit",
+        'element': msgJson.element,
+        'title': msgJson.title,
+        'unitId': newId});
 
-    await sql.query(sql.format('INSERT INTO Week SET ?;', newWeekData));
-    let [weekId] = await sql.query('SELECT weekId FROM Week WHERE weekName LIKE  \"' + msgJson.title + "\" ");
-    let newId = "week" + weekId[0].weekId; // add week part of id
-    message = JSON.stringify({
-      'method': 'save',
-      'element': msgJson.element,
-      'title': msgJson.title,
-      'duration': msgJson.duration,
-      'unit': msgJson.unit,
-      'weekId': newId
-    });
+
+    }else{
+      const newWeekData = {
+        weekName: msgJson.title,
+        duration: msgJson.duration,
+        unitId: msgJson.unit
+      };
+
+      await sql.query(sql.format('INSERT INTO Week SET ?;', newWeekData));
+      let [weekId] = await sql.query('SELECT weekId FROM Week WHERE weekName LIKE  \"' + msgJson.title + "\" ");
+      let newId = "week" + weekId[0].weekId; // add week part of id
+      message = JSON.stringify({
+        'method': 'save',
+        'element': msgJson.element,
+        'title': msgJson.title,
+        'duration': msgJson.duration,
+        'unit': msgJson.unit,
+        'type': msgJson.type,
+        'weekId': newId
+      });
+    }
   }
 
   // forward message to clients chnage as will add when on diff page
@@ -94,7 +108,7 @@ async function getUnitContent(req, res) {
   console.log("unitId: " + req.query.unitId);
   try {
     // pull the weeks
-    let [weeks] = await sql.query(sql.format('SELECT * FROM Week WHERE unitId LIKE ' + req.query.unitId));
+    let [weeks] = await sql.query(sql.format('SELECT * FROM Week WHERE unitId LIKE  \"' + req.query.unitId + "\"  ORDER BY positon ASC "));
 
     //pull the resources for the weeks
     let resources = [];

@@ -99,18 +99,37 @@ nav a {
 }
 
 .add {
-  color: green;
-  display: block;
+
   opacity: 0;
   visibility: hidden;
   /* hidden elements don't register clicks */
   transition: opacity 0.3s, visibility 0s;
 }
 
+#unitAdd{
+  color: green;
+  display: block;
+}
+
+
 li:hover>.add {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
+}
+
+article{
+  background:#dedfe0;
+}
+
+article > p,  article > input  {
+  background: #b8babc;
+  color: Black;
+
+}
+#tempPlus{
+  font-size: 5em;
+  color:green;
 }
 
 #weekAdd {}

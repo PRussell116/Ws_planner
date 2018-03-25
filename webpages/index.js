@@ -6,6 +6,8 @@ window.location.port || 80) + "/");
 ws.addEventListener("message", recivedMessageFromServer);
 
 async function init() {
+  document.getElementById('unitAdd').addEventListener('click',addUnitInputs);
+
   await loadUnits();
 
   console.log("init");
@@ -47,6 +49,34 @@ function putUnitsInPage(units) {
   }
 }
 
+// create elements to input new unit
+function addUnitInputs(e){
+  // remove listner for multi clicks
+  document.getElementById('unitAdd').removeEventListener('click',addUnitInputs);
+  const template = document.querySelector('#unitInput_t');
+  let newEl = document.importNode(template.content, true).children[0];
+  newEl.setAttribute('id','addUnitBox');
+  newEl.querySelector('input').setAttribute('id',"unitNameBox");
+  newEl.querySelector('.save').addEventListener('click',saveUnit);
+  newEl.querySelector('.cancel').addEventListener('click',cancelUnit);
+  document.getElementById('unitsBar').appendChild(newEl);
+}
+function saveUnit(e){
+  const unitName = document.getElementById('unitNameBox').value;
+  // send save to WS, (elment always nav bar)
+    ws.send(JSON.stringify({'method': 'save','type': 'unit', 'element': "unitsBar", 'title': unitName}));
+  // readd listner + delete box
+  cancelUnit(e);
+}
+
+function cancelUnit(e){
+  // readd listner
+  document.getElementById('unitAdd').addEventListener('click',addUnitInputs);
+
+  document.getElementById('addUnitBox').remove();
+
+}
+
 function deleteUnit(e) {
   let eleToDelete = this.parentNode
   eleToDelete.remove();
@@ -82,14 +112,35 @@ function putUnitContentInPage(content) {
   let newWeeks = content.weeks
   let tempWeek = document.createElement('li');
   tempWeek.setAttribute('id', 'tempWeek');
+  tempWeek.classList.add("week");
+  tempWeek.innerText = "Add a week to the new unit ";
   document.getElementById("weeks").appendChild(tempWeek);
 
+  let tempPlus = document.createElement('a');
+  tempPlus.innerText = "+";
+  tempPlus.setAttribute('id',"tempPlus");
+  tempWeek.appendChild(tempPlus);
+
   for (let i = 0; i < newWeeks.length; i++) {
-    let newId = "week" + newWeeks[i].weekId
-    addWeekToPage("tempWeek", newWeeks[i].weekName, newWeeks[i].duration, newId);
+    let newId = "week" + newWeeks[i].weekId;
+    let weekToAddTo = "";
+    if(i == 0){
+      weekToAddTo = "tempWeek"
+    }else{
+      weekToAddTo = "week" + newWeeks[i-1].weekId;
+    }
+    addWeekToPage(weekToAddTo, newWeeks[i].weekName, newWeeks[i].duration, newId);
 
   }
-  tempWeek.remove();
+
+  // only contains tempWeek
+  if(document.getElementById('weeks').children.length == 1){
+  //  tempWeek.classList.add('hidden');
+      tempPlus.addEventListener('click',addWeekInputs);
+    // make a hidden week
+  }else{
+    tempWeek.remove();
+  }
 
 }
 
@@ -119,7 +170,9 @@ function deleteWeek(e) {
   selectedEle.removeEventListener('click', deleteWeek);
 }
 
+
 function addWeekInputs(e) {
+
   console.log("add week event started");
 
   let addBox = document.createElement('article');
@@ -190,6 +243,10 @@ function addWeekToPage(prevEle, title, duration, weekId) {
   document.getElementById(prevEle).insertAdjacentElement('afterEnd', newEl);
   // do something with duration
 
+  if(prevEle == "tempWeek"){
+    document.getElementById("tempWeek").remove();
+  }
+
 }
 
 function saveHandler(e) {
@@ -198,7 +255,7 @@ function saveHandler(e) {
   let title = document.getElementById('titleBox').value;
   let duration = document.getElementById('duration').value;
   let unit = document.getElementById('currentUnitId').textContent;
-  ws.send(JSON.stringify({'method': 'save', 'element': weekToAddTo.innerText, 'title': title, 'duration': duration, 'unit': unit}));
+  ws.send(JSON.stringify({'method': 'save','type':'week', 'element': weekToAddTo.innerText, 'title': title, 'duration': duration, 'unit': unit}));
 
   document.getElementById('addWeekBox').remove();
   // re-add the event listener to the + button
@@ -238,22 +295,32 @@ function yesNoHandler(e) {
   }
 }
 
-function recivedMessageFromServer(e) {
+async function recivedMessageFromServer(e) {
   console.log("message recived");
   const recived = JSON.parse(e.data);
+  if(recived.type == "unit" && recived.method == "save"){
+    console.log("it worked");
+    const newUnitJson = [{'unitName':recived.title,'unitId':recived.unitId}]
+    putUnitsInPage(newUnitJson);
+  }
+
+
   // prevent adding to wrong pages
-  console.log("unit" + document.getElementById('currentUnitId').textContent);
+
   if (recived.unit == document.getElementById('currentUnitId').textContent) {
 
     if (recived.method == "delete" && recived.type != "unit") {
       deleteElement(recived.element);
-    } else if (recived.method == "save") {
-      addWeekToPage(recived.element, recived.title, recived.duration, recived.weekId);
-      console.log("weekId line 283" + recived.weekId);
     }
+  
 
+    else if (recived.method == "save") {
+        console.log("reached line 284");
+        if(recived.type == "week"){
+            addWeekToPage(recived.element, recived.title, recived.duration, recived.weekId);
+        }
+    }
   }
-
 }
 
 let selectedEle = null;
