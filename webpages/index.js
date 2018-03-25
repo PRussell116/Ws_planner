@@ -312,7 +312,7 @@ async function recivedMessageFromServer(e) {
     if (recived.method == "delete" && recived.type != "unit") {
       deleteElement(recived.element);
     }
-  
+
 
     else if (recived.method == "save") {
         console.log("reached line 284");
@@ -321,6 +321,23 @@ async function recivedMessageFromServer(e) {
         }
     }
   }
+}
+
+// type can be moved/added/deleted
+function updatePositon(week,type){
+  let weeksList = document.getElementById('weeks').children;
+  let weekId = week.id.slice(4); // remove weekpart of id e.g week24 -> 24
+  let newPos = 0;
+  const unitId = document.getElementById('currentUnitId').textContent;
+  for(newPos;newPos<weeksList.length;newPos++){
+    if(weeksList[newPos] == week){
+      break;
+    }
+
+  }
+  console.log("newPos: " + newPos);
+  // send to msg server to tell new pos + update pos of ones below
+  ws.send(JSON.stringify({'method': 'position','element': weekId, 'positon':newPos + 1,'unitId': unitId}));
 }
 
 let selectedEle = null;
@@ -370,6 +387,11 @@ function handleDrop(e) {
       innerDeletes[i].addEventListener('click', deleteWeek);
     }
     addDragDropHandlers(dropElem);
+
+    // function to update positions of elements in DB
+    updatePositon(dropElem,"moved");
+
+
   }
   this.classList.remove('over');
   return false;

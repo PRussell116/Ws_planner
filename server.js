@@ -19,7 +19,6 @@ function connectionHandler(ws) {
   ws.on('message', messageHandler)
 
 }
-// combo with fetches
 async function messageHandler(message, res) {
   const sql = await connection;
 
@@ -48,18 +47,13 @@ async function messageHandler(message, res) {
     }
   } else if (msgJson.method == 'save') {
     // add to DB
-    if(msgJson.type == "unit"){
-      await sql.query(sql.format('INSERT INTO Unit VALUES ( NULL,  \"' + msgJson.title + "\" )" ));
-        let [unitId] = await sql.query('SELECT unitId FROM Unit WHERE unitName LIKE  \"' + msgJson.title + "\" ");
-        let newId = unitId[0].unitId;
-        message = JSON.stringify({'method': 'save',
-        'type'  : "unit",
-        'element': msgJson.element,
-        'title': msgJson.title,
-        'unitId': newId});
+    if (msgJson.type == "unit") {
+      await sql.query(sql.format('INSERT INTO Unit VALUES ( NULL,  \"' + msgJson.title + "\" )"));
+      let [unitId] = await sql.query('SELECT unitId FROM Unit WHERE unitName LIKE  \"' + msgJson.title + "\" ");
+      let newId = unitId[0].unitId;
+      message = JSON.stringify({'method': 'save', 'type': "unit", 'element': msgJson.element, 'title': msgJson.title, 'unitId': newId});
 
-
-    }else{
+    } else {
       const newWeekData = {
         weekName: msgJson.title,
         duration: msgJson.duration,
@@ -79,6 +73,17 @@ async function messageHandler(message, res) {
         'weekId': newId
       });
     }
+
+  }else if (msgJson.method == 'position') {
+
+      // +1 position to all records after
+    await sql.query('UPDATE Week SET positon = positon + 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
+    // update record
+    await sql.query('UPDATE Week SET positon = \"' + msgJson.positon + "\" WHERE WeekId = " + msgJson.element);
+
+
+
+
   }
 
   // forward message to clients chnage as will add when on diff page
