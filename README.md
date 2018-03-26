@@ -1,6 +1,3 @@
 # Ws_planner
 
-2nd year webscript programming coursework:
-
-
-A University unit planning tool
+Webscript unit planning web app

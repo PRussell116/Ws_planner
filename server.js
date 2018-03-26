@@ -75,11 +75,19 @@ async function messageHandler(message, res) {
     }
 
   }else if (msgJson.method == 'position') {
-
+    if(msgJson.type == "move" || msgJson.type == "add"){
       // +1 position to all records after
     await sql.query('UPDATE Week SET positon = positon + 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
     // update record
     await sql.query('UPDATE Week SET positon = \"' + msgJson.positon + "\" WHERE WeekId = " + msgJson.element);
+    }
+    else if(msgJson.type == "delete"){
+      // -1 postion from all after the deleted item
+      await sql.query('UPDATE Week SET positon = positon - 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
+    }
+
+
+
 
 
 

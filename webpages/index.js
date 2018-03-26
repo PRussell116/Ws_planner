@@ -246,7 +246,8 @@ function addWeekToPage(prevEle, title, duration, weekId) {
   if(prevEle == "tempWeek"){
     document.getElementById("tempWeek").remove();
   }
-
+  // tell server to update positions
+  updatePositon(newEl,"add");
 }
 
 function saveHandler(e) {
@@ -284,6 +285,10 @@ function yesNoHandler(e) {
   }
   const unit = document.getElementById('currentUnitId').textContent;
   if (selectedEle.innerText == "yes") {
+    if(elementToDelete.classList.contains("week")){
+      // tell server to update positions
+      updatePositon(elementToDelete,"delete");
+    }
     // tell server to delete
 
     ws.send(JSON.stringify({'method': 'delete', 'element': delId, 'type': type, 'unit': unit}));
@@ -337,7 +342,7 @@ function updatePositon(week,type){
   }
   console.log("newPos: " + newPos);
   // send to msg server to tell new pos + update pos of ones below
-  ws.send(JSON.stringify({'method': 'position','element': weekId, 'positon':newPos + 1,'unitId': unitId}));
+  ws.send(JSON.stringify({'method': 'position','element': weekId, 'positon':newPos + 1,'type':type,'unitId': unitId}));
 }
 
 let selectedEle = null;
