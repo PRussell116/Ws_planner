@@ -1,11 +1,14 @@
 'use strict';
 console.log("connected");
+
+
 window.addEventListener('load', init);
 let ws = new WebSocket("ws://" + window.location.hostname + ":" + (
 window.location.port || 80) + "/");
 ws.addEventListener("message", recivedMessageFromServer);
 
 async function init() {
+
   document.getElementById('unitAdd').addEventListener('click',addUnitInputs);
 
   await loadUnits();
@@ -116,6 +119,12 @@ function putUnitContentInPage(content) {
   tempWeek.innerText = "Add a week to the new unit ";
   document.getElementById("weeks").appendChild(tempWeek);
 
+  //
+
+
+
+
+
   let tempPlus = document.createElement('a');
   tempPlus.innerText = "+";
   tempPlus.setAttribute('id',"tempPlus");
@@ -130,6 +139,8 @@ function putUnitContentInPage(content) {
       weekToAddTo = "week" + newWeeks[i-1].weekId;
     }
     addWeekToPage(weekToAddTo, newWeeks[i].weekName, newWeeks[i].duration, newId);
+    getResources(newWeeks[i].weekId);
+
 
   }
 
@@ -236,6 +247,10 @@ function addWeekToPage(prevEle, title, duration, weekId) {
 
   newEl.querySelector('details > summary').innerText = title;
 
+  let resourceUL = newEl.querySelector('#resourceUL');
+  resourceUL.setAttribute('id',"resourceUL" + weekId);
+  resourceUL.addEventListener('drop',resourceDropHandler);
+
   addDragDropHandlers(newEl);
   const newId = "week" + weekId;
   newEl.setAttribute('id', weekId);
@@ -249,6 +264,35 @@ function addWeekToPage(prevEle, title, duration, weekId) {
   // tell server to update positions
   updatePositon(newEl,"add");
 }
+
+
+async function getResources(eleToAppend){
+  let resources = await fetch('/resources/?weekId=' + eleToAppend);
+  putResourcesInPage(eleToAppend,await resources.json());
+
+}
+function putResourcesInPage(eleToAppend,resources){
+  // delete old resources
+
+
+
+  let ulToAppend = document.getElementById("week" + eleToAppend).querySelector('ul');
+  while(ulToAppend.firstChild){
+    ulToAppend.removeChild(ulToAppend.firstChild);
+
+  }
+
+  for(let i =0;i<resources.length;i++){
+    const newResc = document.createElement('li');
+    newResc.innerText = resources[i].fileName;
+    newResc.classList.add('resource');
+    newResc.download = resources[i].file;
+
+    ulToAppend.appendChild(newResc);
+  }
+
+}
+
 
 function saveHandler(e) {
   // get content from boxes
@@ -323,6 +367,10 @@ async function recivedMessageFromServer(e) {
         console.log("reached line 284");
         if(recived.type == "week"){
             addWeekToPage(recived.element, recived.title, recived.duration, recived.weekId);
+        }
+        else if (recived.type == "resource") {
+          addResourceToPage(recived.element,recived.fileData);
+
         }
     }
   }
@@ -407,6 +455,45 @@ function handleDragEnd(e) {
   this.classList.remove('over');
 
 }
+
+
+async function resourceDropHandler(e){
+  // get the id of week being dropped into (remove week part of id e.g week24 ->24);
+  const elementId = this.parentNode.parentNode.id.slice(4);
+  const unit = document.getElementById('currentUnitId').textContent;
+  e.preventDefault();
+  // iterate over the files dragged on to the browser
+  for (const file of e.dataTransfer.files) {
+    let opts = {
+      method: 'POST',
+      body: new FormData()
+    };
+    opts.body.append(`md5me`,file,file.name);
+    const response = await fetch('/upload?element='+ elementId,opts);
+    if(response.ok){
+      // put in page
+      getResources(elementId);
+    }else{
+      // show error html
+      console.log("eror")
+    }
+
+  }
+  this.classList.remove('over');
+}
+
+    // // instantiate a new FileReader object
+    // let fileBod = newFormData();
+    // fileBod.append('md5me',file,file.name);
+    //   // send the file over web sockets
+    //   console.log(fr.result);
+    //  ws.send(JSON.stringify({'method': 'save','type': 'resource', 'element': elementId,'unit': unit, 'fileData':fileBod}));
+    //
+    // }
+
+
+
+// ws.send(JSON.stringify({'method': 'save','type': 'unit', 'element': "unitsBar", 'title': unitName}));
 
 function addDragDropHandlers(elem) {
   elem.addEventListener('dragstart', handleDragStart, false);

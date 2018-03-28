@@ -3,6 +3,8 @@ const webSocket = require('ws');
 const http = require('http')
 const ip = require("ip");
 const mysql = require('mysql2/promise');
+const multer = require('multer');
+const md5File = require('md5-file/promise');
 
 const connection = mysql.createConnection({host: 'localhost', user: 'root', password: 'root', charset: 'UTF8MB4', database: 'plannerDB'});
 
@@ -53,12 +55,17 @@ async function messageHandler(message, res) {
       let newId = unitId[0].unitId;
       message = JSON.stringify({'method': 'save', 'type': "unit", 'element': msgJson.element, 'title': msgJson.title, 'unitId': newId});
 
+
+
+
     } else {
       const newWeekData = {
         weekName: msgJson.title,
         duration: msgJson.duration,
         unitId: msgJson.unit
       };
+
+
 
       await sql.query(sql.format('INSERT INTO Week SET ?;', newWeekData));
       let [weekId] = await sql.query('SELECT weekId FROM Week WHERE weekName LIKE  \"' + msgJson.title + "\" ");
@@ -85,15 +92,7 @@ async function messageHandler(message, res) {
       // -1 postion from all after the deleted item
       await sql.query('UPDATE Week SET positon = positon - 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
     }
-
-
-
-
-
-
-
   }
-
   // forward message to clients chnage as will add when on diff page
   wss.clients.forEach((client) => {
     if (client.readyState === client.OPEN) {
@@ -137,6 +136,66 @@ async function getUnitContent(req, res) {
 
 }
 
+async function getResources(req,res){
+
+  const sql = await connection;
+  try {
+
+    //pull the resources for the weeks
+      let [weekResources] = await sql.query('SELECT * FROM WeekResources WHERE weekId = ' + req.query.weekId);
+      res.json(weekResources);
+
+
+
+  } catch (e) {
+    error(res, e);
+  }
+}
+
+
+// fs module // multer in memory upload
+const configedMult = multer({
+    "dest": "uploads/",
+    "limits": {
+        "fields": 10,
+        "fileSize": 104800000000,
+        "files": 1
+    }
+});
+const single = configedMult.single('md5me');
+
+
+async function upload(req,res){
+  console.log(req.query);
+
+  single(req,res, async(error) =>{
+    if (error) {
+           if (error.code === 'LIMIT_FILE_SIZE') {
+               res.status(413).send('Request Entity Too Large');
+           } else {
+               res.status(500).send('Server Error');
+           }
+           return;
+       }
+     console.log("buffer" + req.file.buffer);
+     console.log("req file" + req.file);
+     console.log("req file path" + req.file.path);
+     console.log("req file data" + req.file);
+      console.log("req file orignalName" + req.file.originalname);
+     const sql = await connection;
+     const resourceSet = {
+       weekId: req.query.element,
+       file:   req.file,
+       fileName: req.file.originalname
+
+       }
+     //  console.log("file data" + JSON.stringify(msgJson.fileData));
+
+         await sql.query(sql.format('INSERT INTO WeekResources SET ?;' ,  resourceSet));
+         res.sendStatus(200);
+  });
+}
+
 function error(res, msg) {
   res.sendStatus(500);
   console.error(msg);
@@ -144,8 +203,11 @@ function error(res, msg) {
 
 app.use(express.static(`${__dirname}/webpages`));
 //app.get('/week',loadWeeks);
+
+app.post('/upload', upload);
 app.get('/unit', loadUnits);
 app.get('/unitContent', getUnitContent);
+app.get('/resources',getResources);
 
 server.listen(port, () => {
   console.log('Server started:', `http://${ip.address()}:${port}`)
