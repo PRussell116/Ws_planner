@@ -5,6 +5,10 @@ const ip = require("ip");
 const mysql = require('mysql2/promise');
 const multer = require('multer');
 const md5File = require('md5-file/promise');
+const fs = require('fs');
+const util = require('util');
+
+
 
 const connection = mysql.createConnection({host: 'localhost', user: 'root', password: 'root', charset: 'UTF8MB4', database: 'plannerDB'});
 
@@ -15,6 +19,10 @@ const server = http.createServer(app);
 const wss = new webSocket.Server({server: server});
 
 wss.on('connection', connectionHandler);
+
+// promisify some filesystem functions
+fs.unlinkAsync = fs.unlinkAsync || util.promisify(fs.unlink);
+fs.renameAsync = fs.renameAsync || util.promisify(fs.rename);
 
 function connectionHandler(ws) {
   console.log("connected");
@@ -145,21 +153,22 @@ async function getResources(req,res){
       let [weekResources] = await sql.query('SELECT * FROM WeekResources WHERE weekId = ' + req.query.weekId);
       res.json(weekResources);
 
-
-
   } catch (e) {
     error(res, e);
   }
 }
 
 
-// fs module // multer in memory upload
+
+// chnage file size to smaller
 const configedMult = multer({
     "dest": "uploads/",
+
     "limits": {
         "fields": 10,
         "fileSize": 104800000000,
         "files": 1
+
     }
 });
 const single = configedMult.single('md5me');
@@ -177,19 +186,14 @@ async function upload(req,res){
            }
            return;
        }
-     console.log("buffer" + req.file.buffer);
-     console.log("req file" + req.file);
-     console.log("req file path" + req.file.path);
-     console.log("req file data" + req.file);
-      console.log("req file orignalName" + req.file.originalname);
+     await fs.renameAsync(req.file.path,`${__dirname}/webpages/resources/` + req.file.originalname);
+
      const sql = await connection;
      const resourceSet = {
        weekId: req.query.element,
-       file:   req.file,
        fileName: req.file.originalname
 
        }
-     //  console.log("file data" + JSON.stringify(msgJson.fileData));
 
          await sql.query(sql.format('INSERT INTO WeekResources SET ?;' ,  resourceSet));
          res.sendStatus(200);

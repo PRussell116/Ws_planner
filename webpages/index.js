@@ -273,20 +273,27 @@ async function getResources(eleToAppend){
 }
 function putResourcesInPage(eleToAppend,resources){
   // delete old resources
-
-
-
+  console.log(resources);
   let ulToAppend = document.getElementById("week" + eleToAppend).querySelector('ul');
   while(ulToAppend.firstChild){
     ulToAppend.removeChild(ulToAppend.firstChild);
 
   }
+  const dropHelper  = document.createElement('li');
+  dropHelper.innerText = "Drop resources here!";
+  ulToAppend.appendChild(dropHelper);
 
-  for(let i =0;i<resources.length;i++){
+  for(let i = 0;i<resources.length;i++){
     const newResc = document.createElement('li');
-    newResc.innerText = resources[i].fileName;
     newResc.classList.add('resource');
-    newResc.download = resources[i].file;
+
+    const newRescA = document.createElement('a');
+    newRescA.innerText = resources[i].fileName;
+
+     newRescA.setAttribute('href',"/resources/" + resources[i].fileName);
+     newRescA.download = "/resources/" + resources[i].fileName;
+     newResc.appendChild(newRescA);
+    // newRescA.setAttribute('download',"/resources/" + resources[i].file);
 
     ulToAppend.appendChild(newResc);
   }
@@ -348,7 +355,6 @@ async function recivedMessageFromServer(e) {
   console.log("message recived");
   const recived = JSON.parse(e.data);
   if(recived.type == "unit" && recived.method == "save"){
-    console.log("it worked");
     const newUnitJson = [{'unitName':recived.title,'unitId':recived.unitId}]
     putUnitsInPage(newUnitJson);
   }
@@ -481,19 +487,6 @@ async function resourceDropHandler(e){
   }
   this.classList.remove('over');
 }
-
-    // // instantiate a new FileReader object
-    // let fileBod = newFormData();
-    // fileBod.append('md5me',file,file.name);
-    //   // send the file over web sockets
-    //   console.log(fr.result);
-    //  ws.send(JSON.stringify({'method': 'save','type': 'resource', 'element': elementId,'unit': unit, 'fileData':fileBod}));
-    //
-    // }
-
-
-
-// ws.send(JSON.stringify({'method': 'save','type': 'unit', 'element': "unitsBar", 'title': unitName}));
 
 function addDragDropHandlers(elem) {
   elem.addEventListener('dragstart', handleDragStart, false);

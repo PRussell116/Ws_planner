@@ -22,7 +22,6 @@ create table if not exists plannerDB.WeekResources (
   resourceId int primary key auto_increment,
   WeekId int,
   fileName varChar(30),
-  file Blob,
   foreign key (weekID) references Week(weekId) on delete cascade
 
 );

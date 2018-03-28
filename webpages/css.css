@@ -102,6 +102,7 @@ nav a {
 
   opacity: 0;
   visibility: hidden;
+  color: green;
   /* hidden elements don't register clicks */
   transition: opacity 0.3s, visibility 0s;
 }
