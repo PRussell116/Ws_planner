@@ -8,16 +8,17 @@ const md5File = require('md5-file/promise');
 const fs = require('fs');
 const util = require('util');
 
-
-
+// default sql connection
 const connection = mysql.createConnection({host: 'localhost', user: 'root', password: 'root', charset: 'UTF8MB4', database: 'plannerDB'});
 
 const app = express();
 const port = 8080;
 
+// set up websocket server
 const server = http.createServer(app);
 const wss = new webSocket.Server({server: server});
 
+// when connected to websocked call handler
 wss.on('connection', connectionHandler);
 
 // promisify some filesystem functions
@@ -26,9 +27,21 @@ fs.renameAsync = fs.renameAsync || util.promisify(fs.rename);
 
 function connectionHandler(ws) {
   console.log("connected");
+  // when message from ws recived call msg handler
   ws.on('message', messageHandler)
 
 }
+/**
+*handles messages sent from the client via websocket by adjusting the database and sending a response
+* @param message : json object sent via the websocket can contain vaules :
+ method : the method to be carried out e.g delete / save / positions
+ element: id of the element / the element to appendto
+ weekId : the id of the weeks
+ unitId : the id of the unit_t
+
+ @returns sends a json message back to the client
+
+*/
 async function messageHandler(message, res) {
   const sql = await connection;
 
@@ -63,19 +76,16 @@ async function messageHandler(message, res) {
       let newId = unitId[0].unitId;
       message = JSON.stringify({'method': 'save', 'type': "unit", 'element': msgJson.element, 'title': msgJson.title, 'unitId': newId});
 
-
-
-
     } else {
+      // data to insert into the database
       const newWeekData = {
         weekName: msgJson.title,
         duration: msgJson.duration,
         unitId: msgJson.unit
       };
-
-
-
+      // insert values to db
       await sql.query(sql.format('INSERT INTO Week SET ?;', newWeekData));
+      // find id in db to create new id for clientside to use
       let [weekId] = await sql.query('SELECT weekId FROM Week WHERE weekName LIKE  \"' + msgJson.title + "\" ");
       let newId = "week" + weekId[0].weekId; // add week part of id
       message = JSON.stringify({
@@ -88,20 +98,19 @@ async function messageHandler(message, res) {
         'weekId': newId
       });
     }
-
-  }else if (msgJson.method == 'position') {
-    if(msgJson.type == "move" || msgJson.type == "add"){
+    // called from moving
+  } else if (msgJson.method == 'position') {
+    if (msgJson.type == "moved" || msgJson.type == "add") {
       // +1 position to all records after
-    await sql.query('UPDATE Week SET positon = positon + 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
-    // update record
-    await sql.query('UPDATE Week SET positon = \"' + msgJson.positon + "\" WHERE WeekId = " + msgJson.element);
-    }
-    else if(msgJson.type == "delete"){
+      await sql.query('UPDATE Week SET positon = positon + 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
+      // change position to new position
+      await sql.query('UPDATE Week SET positon = \"' + msgJson.positon + "\" WHERE WeekId = " + msgJson.element// called after deletion);
+    } else if (msgJson.type == "delete") {
       // -1 postion from all after the deleted item
       await sql.query('UPDATE Week SET positon = positon - 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
     }
   }
-  // forward message to clients chnage as will add when on diff page
+  // forward message to clients to adjust their page
   wss.clients.forEach((client) => {
     if (client.readyState === client.OPEN) {
       try {
@@ -113,6 +122,11 @@ async function messageHandler(message, res) {
   });
 }
 
+/* function to get all units from the database
+
+@param req express request object
+@param req express response object
+@returns units json of the sql query obtained */
 async function loadUnits(req, res) {
   const sql = await connection;
   try {
@@ -122,16 +136,23 @@ async function loadUnits(req, res) {
     error(res, e);
   }
 }
+/**
+function to get all the weeks and resources of a weeks
+@param req express reqest object containing url with the id of the requested unit_t
+@param res express response object
+@returns json object containg the json of all weeks and resources of the unit
+*/
 
 async function getUnitContent(req, res) {
   const sql = await connection;
   console.log("unitId: " + req.query.unitId);
   try {
-    // pull the weeks
+    // pull the weeks and order by position for client side
     let [weeks] = await sql.query(sql.format('SELECT * FROM Week WHERE unitId LIKE  \"' + req.query.unitId + "\"  ORDER BY positon ASC "));
 
     //pull the resources for the weeks
     let resources = [];
+    // loop though weeks and get the resources of that week
     for (let i = 0; i < weeks.length; i++) {
       let [weekResources] = await sql.query('SELECT * FROM WeekResources WHERE weekId = ' + weeks[i].weekId);
       resources += await weekResources;
@@ -143,75 +164,82 @@ async function getUnitContent(req, res) {
   }
 
 }
+/* function to get all the resouices based on a week
+@param req express request object containing the weekID
+@param res express response object
+@returns all the resources of the week in json */
 
-async function getResources(req,res){
+async function getResources(req, res) {
 
   const sql = await connection;
   try {
 
     //pull the resources for the weeks
-      let [weekResources] = await sql.query('SELECT * FROM WeekResources WHERE weekId = ' + req.query.weekId);
-      res.json(weekResources);
+    let [weekResources] = await sql.query('SELECT * FROM WeekResources WHERE weekId = ' + req.query.weekId);
+    res.json(weekResources);
 
   } catch (e) {
     error(res, e);
   }
 }
 
-
-
-// chnage file size to smaller
+// configure multer to use uploads folder, limit the file size, and only use 1 file at a time
 const configedMult = multer({
-    "dest": "uploads/",
+  "dest": "uploads/",
 
-    "limits": {
-        "fields": 10,
-        "fileSize": 104800000000,
-        "files": 1
+  "limits": {
+    "fields": 10,
+    "fileSize": 104800000000,
+    "files": 1
 
-    }
+  }
 });
 const single = configedMult.single('md5me');
 
-
-async function upload(req,res){
+/* function to handle file uploads to the Server
+@param req express request object containing the file
+@param res express response object
+@returns one of status codes : 413 , 500, 200 */
+async function upload(req, res) {
   console.log(req.query);
 
-  single(req,res, async(error) =>{
+  single(req, res, async (error) => {
     if (error) {
-           if (error.code === 'LIMIT_FILE_SIZE') {
-               res.status(413).send('Request Entity Too Large');
-           } else {
-               res.status(500).send('Server Error');
-           }
-           return;
-       }
-     await fs.renameAsync(req.file.path,`${__dirname}/webpages/resources/` + req.file.originalname);
+      // if reaches limit configured above
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        res.status(413).send('Request Entity Too Large');
+      } else {
+        res.status(500).send('Server Error');
+      }
+      return;
+    }
+    // save the file in the uploads folder
+    await fs.renameAsync(req.file.path, `${__dirname}/webpages/resources/` + req.file.originalname);
 
-     const sql = await connection;
-     const resourceSet = {
-       weekId: req.query.element,
-       fileName: req.file.originalname
+    // sql to insert
+    const sql = await connection;
+    const resourceSet = {
+      weekId: req.query.element,
+      fileName: req.file.originalname
 
-       }
-
-         await sql.query(sql.format('INSERT INTO WeekResources SET ?;' ,  resourceSet));
-         res.sendStatus(200);
+    }
+    // insert the file details into the DB
+    await sql.query(sql.format('INSERT INTO WeekResources SET ?;', resourceSet));
+    res.sendStatus(200);
   });
 }
-
+// log errors
 function error(res, msg) {
   res.sendStatus(500);
   console.error(msg);
 }
-
+// use static pages
 app.use(express.static(`${__dirname}/webpages`));
-//app.get('/week',loadWeeks);
 
 app.post('/upload', upload);
 app.get('/unit', loadUnits);
 app.get('/unitContent', getUnitContent);
-app.get('/resources',getResources);
+app.get('/resources', getResources);
 
 server.listen(port, () => {
   console.log('Server started:', `http://${ip.address()}:${port}`)
