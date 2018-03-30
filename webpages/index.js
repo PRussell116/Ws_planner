@@ -247,11 +247,16 @@ function addWeekToPage(prevEle, title, duration, weekId) {
 
   newEl.querySelector('details > summary').innerText = title;
 
-  let resourceUL = newEl.querySelector('#resourceUL');
-  resourceUL.setAttribute('id',"resourceUL" + weekId);
-  resourceUL.addEventListener('drop',resourceDropHandler);
 
   addDragDropHandlers(newEl);
+
+  let resourceUL = newEl.querySelector('#resourceUL');
+  resourceUL.setAttribute('id',"resourceUL" + weekId);
+  resourceUL.removeEventListener('drop',handleDrop);
+  resourceUL.addEventListener('drop',resourceDropHandler);
+
+
+
   const newId = "week" + weekId;
   newEl.setAttribute('id', weekId);
 
@@ -464,6 +469,7 @@ function handleDragEnd(e) {
 
 
 async function resourceDropHandler(e){
+  if(this.parent)
   // get the id of week being dropped into (remove week part of id e.g week24 ->24);
   const elementId = this.parentNode.parentNode.id.slice(4);
   const unit = document.getElementById('currentUnitId').textContent;
