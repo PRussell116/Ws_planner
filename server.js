@@ -9,14 +9,22 @@ const fs = require('fs');
 const util = require('util');
 
 // default sql connection
-const connection = mysql.createConnection({host: 'localhost', user: 'root', password: 'root', charset: 'UTF8MB4', database: 'plannerDB'});
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'root',
+  charset: 'UTF8MB4',
+  database: 'plannerDB'
+});
 
 const app = express();
 const port = 8080;
 
 // set up websocket server
 const server = http.createServer(app);
-const wss = new webSocket.Server({server: server});
+const wss = new webSocket.Server({
+  server: server
+});
 
 // when connected to websocked call handler
 wss.on('connection', connectionHandler);
@@ -39,13 +47,13 @@ function connectionHandler(ws) {
  weekId : the id of the weeks
  unitId : the id of the unit_t
 
- @returns sends a json message back to the client
+ *@returns sends a json message back to the client
 
 */
 async function messageHandler(message, res) {
   const sql = await connection;
 
-  console.log('received: %s', message);
+
   let msgJson = JSON.parse(message);
   if (msgJson.method == 'delete') {
     // remove unit from DB
@@ -57,15 +65,21 @@ async function messageHandler(message, res) {
       // remove from DB by Id
       await sql.query('DELETE FROM Week WHERE weekID = ' + msgJson.element);
       const eleId = "week" + msgJson.element; // readd the week part of element to delete from page
-      console.log("eleid" + eleId);
-      console.log("unit" + msgJson.unit);
-      message = JSON.stringify({'method': 'delete', 'element': eleId, 'unit': msgJson.unit});
+
+      message = JSON.stringify({
+        'method': 'delete',
+        'element': eleId,
+        'unit': msgJson.unit
+      });
 
     } else if (msgJson.type == 'resource') {
       // remove from DB by Id
       //      await sql.query('DELETE FROM weekResources WHERE   resourceId = ' + msgJson.element);
       const eleId = "resource" + msgJson.element; // readd the resource part of element to delete from page
-      message = ({'method': 'delete', 'element': eleId});
+      message = ({
+        'method': 'delete',
+        'element': eleId
+      });
 
     }
   } else if (msgJson.method == 'save') {
@@ -74,7 +88,13 @@ async function messageHandler(message, res) {
       await sql.query(sql.format('INSERT INTO Unit VALUES ( NULL,  \"' + msgJson.title + "\" )"));
       let [unitId] = await sql.query('SELECT unitId FROM Unit WHERE unitName LIKE  \"' + msgJson.title + "\" ");
       let newId = unitId[0].unitId;
-      message = JSON.stringify({'method': 'save', 'type': "unit", 'element': msgJson.element, 'title': msgJson.title, 'unitId': newId});
+      message = JSON.stringify({
+        'method': 'save',
+        'type': "unit",
+        'element': msgJson.element,
+        'title': msgJson.title,
+        'unitId': newId
+      });
 
     } else {
       // data to insert into the database
@@ -104,7 +124,7 @@ async function messageHandler(message, res) {
       // +1 position to all records after
       await sql.query('UPDATE Week SET positon = positon + 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
       // change position to new position
-      await sql.query('UPDATE Week SET positon = \"' + msgJson.positon + "\" WHERE WeekId = " + msgJson.element// called after deletion);
+      await sql.query('UPDATE Week SET positon = \"' + msgJson.positon + "\" WHERE WeekId = " + msgJson.element); // called after deletion
     } else if (msgJson.type == "delete") {
       // -1 postion from all after the deleted item
       await sql.query('UPDATE Week SET positon = positon - 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
@@ -122,11 +142,12 @@ async function messageHandler(message, res) {
   });
 }
 
-/* function to get all units from the database
+/** function to get all units from the database
 
-@param req express request object
-@param req express response object
-@returns units json of the sql query obtained */
+*@param req express request object
+*@param req express response object
+*@returns units json of the sql query obtained
+*/
 async function loadUnits(req, res) {
   const sql = await connection;
   try {
@@ -137,15 +158,15 @@ async function loadUnits(req, res) {
   }
 }
 /**
-function to get all the weeks and resources of a weeks
-@param req express reqest object containing url with the id of the requested unit_t
-@param res express response object
-@returns json object containg the json of all weeks and resources of the unit
-*/
+ *function to get all the weeks and resources of a weeks
+ *@param req express reqest object containing url with the id of the requested unit_t
+ *@param res express response object
+ *@returns json object containg the json of all weeks and resources of the unit
+ */
 
 async function getUnitContent(req, res) {
   const sql = await connection;
-  console.log("unitId: " + req.query.unitId);
+
   try {
     // pull the weeks and order by position for client side
     let [weeks] = await sql.query(sql.format('SELECT * FROM Week WHERE unitId LIKE  \"' + req.query.unitId + "\"  ORDER BY positon ASC "));
@@ -157,17 +178,21 @@ async function getUnitContent(req, res) {
       let [weekResources] = await sql.query('SELECT * FROM WeekResources WHERE weekId = ' + weeks[i].weekId);
       resources += await weekResources;
     }
-    res.json({weeks: weeks, resources: resources});
+    res.json({
+      weeks: weeks,
+      resources: resources
+    });
 
   } catch (e) {
     error(res, e);
   }
 
 }
-/* function to get all the resouices based on a week
-@param req express request object containing the weekID
-@param res express response object
-@returns all the resources of the week in json */
+/** function to get all the resouices based on a week
+ *@param req express request object containing the weekID
+ *@param res express response object
+ *@returns all the resources of the week in json
+ */
 
 async function getResources(req, res) {
 
@@ -196,12 +221,13 @@ const configedMult = multer({
 });
 const single = configedMult.single('md5me');
 
-/* function to handle file uploads to the Server
-@param req express request object containing the file
-@param res express response object
-@returns one of status codes : 413 , 500, 200 */
+/** function to handle file uploads to the Server
+ *@param req express request object containing the file
+ *@param res express response object
+ *@returns one of status codes : 413 , 500, 200
+ */
 async function upload(req, res) {
-  console.log(req.query);
+
 
   single(req, res, async (error) => {
     if (error) {

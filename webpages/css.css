@@ -14,7 +14,10 @@ body {
   grid-auto-rows: minmax(50vh, auto);
 }
 
-.unit {}
+.unit {
+  position: relative;
+  display: inline-block;
+}
 
 .unitBlock {
   background-color: #444;
@@ -40,6 +43,10 @@ body {
 }
 
 .delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
   color: red;
   display: block;
   opacity: 0;
@@ -63,55 +70,47 @@ li:hover>.delete {
 }
 
 nav {
-  z-index: 1;
-  position: fixed;
-  top: 0px;
-  background: black;
   width: 100%;
-  height: 5%
+  background: black;
+  height: 1.5em;
 }
 
-nav ul, nav li {
+nav ul {
+  display: flex;
+  flex-direction: row;
   margin: 0;
   padding: 0;
 }
 
-nav ul {
-  background: black;
+nav ul li {
   list-style: none;
-  width: 100%;
-}
-
-nav li {
-  float: left;
-  position: relative;
-  width: auto;
-}
-
-nav a {
-  background: black;
-  color: white;
-  display: block;
-  font: bold 1em sans-serif;
-  padding: 0.5em 2em;
+  flex-grow: 1;
   text-align: center;
-  text-decoration: none;
+}
+
+nav ul li a {
+  display: block;
+  border-style: solid;
+  border-color: white;
+  color: white;
+  height: 5em;
+  cursor: pointer;
 }
 
 .add {
-
   opacity: 0;
   visibility: hidden;
   color: green;
   /* hidden elements don't register clicks */
   transition: opacity 0.3s, visibility 0s;
+  cursor: pointer;
 }
 
-#unitAdd{
+#unitAdd {
   color: green;
   display: block;
+  cursor: pointer;
 }
-
 
 li:hover>.add {
   opacity: 1;
@@ -119,18 +118,19 @@ li:hover>.add {
   transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
 }
 
-article{
-  background:#dedfe0;
+article {
+  background: #dedfe0;
 }
 
-article > p,  article > input  {
+article>p, article>input {
   background: #b8babc;
   color: Black;
-
 }
-#tempPlus{
+
+#tempPlus {
   font-size: 5em;
-  color:green;
+  color: green;
+  cursor: pointer;
 }
 
 #weekAdd {}
@@ -167,7 +167,9 @@ article > p,  article > input  {
   display: inline-block;
 }
 
-details {}
+details {
+  cursor: pointer;
+}
 
 summary::-webkit-details-marker {
   display: none;
@@ -179,6 +181,10 @@ summary:after {
   font-size: 1.5em;
   font-weight: bold;
   content: "+";
+}
+
+.week {
+  position: relative;
 }
 
 .week.dragElem {

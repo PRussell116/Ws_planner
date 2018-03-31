@@ -4,7 +4,7 @@ console.log("connected");
 window.addEventListener('load', init);
 // create websocket
 let ws = new WebSocket("ws://" + window.location.hostname + ":" + (
-window.location.port || 80) + "/");
+  window.location.port || 80) + "/");
 ws.addEventListener("message", recivedMessageFromServer);
 
 /* initialisation function that calls other functions and adds listners */
@@ -37,9 +37,9 @@ async function loadUnits() {
   let unitJson = await fetch('/unit');
   putUnitsInPage(await unitJson.json());
 }
-/* add the units to the page using template and json from DB
+/** add the units to the page using template and json from DB
  * @param units json object contaning the units and thier vaules
-*/
+ */
 function putUnitsInPage(units) {
   // use template and then add listners
   const template = document.querySelector('#unit_t');
@@ -58,8 +58,9 @@ function putUnitsInPage(units) {
   }
 }
 
-/* create elements to input new unit
-@ param e click event called after clicking a + button */
+/** create elements to input new unit
+ *@param e click event called after clicking a + button
+ */
 function addUnitInputs(e) {
   // remove listner for multi clicks
   document.getElementById('unitAdd').removeEventListener('click', addUnitInputs);
@@ -72,17 +73,29 @@ function addUnitInputs(e) {
   newEl.querySelector('.cancel').addEventListener('click', cancelUnit);
   document.getElementById('unitsBar').appendChild(newEl);
 }
-/* function to send message to websocket to save a unit with the vaules from input boxes
-@param e click event called from pressing the save button */
+/** function to send message to websocket to save a unit with the vaules from input boxes
+ *@param e click event called from pressing the save button
+ */
 function saveUnit(e) {
   const unitName = document.getElementById('unitNameBox').value;
   // send save to WS, (elment always nav bar)
-  ws.send(JSON.stringify({'method': 'save', 'type': 'unit', 'element': "unitsBar", 'title': unitName}));
+  ws.send(JSON.stringify({
+    'method': 'save',
+    'type': 'unit',
+    'element': "unitsBar",
+    'title': unitName
+  }));
   // call cancel unit to readd the event lisnter to the + and remove input boxes
   cancelUnit(e);
 }
-/* function to cancel creating a unit removes the boxes and readds event listner removed from +
-@param e click event from clicking cancel button */
+/** function to cancel creating a unit removes the boxes and readds event listner removed from +
+ *@param e click event from clicking cancel button
+ */
+
+/**
+ *function to remove boxes created by creating a unit and to readd listeners
+ *@param e click event from clicking on the cancel button
+ */
 function cancelUnit(e) {
   // readd listner
   document.getElementById('unitAdd').addEventListener('click', addUnitInputs);
@@ -90,8 +103,10 @@ function cancelUnit(e) {
   document.getElementById('addUnitBox').remove();
 
 }
-/* function to delete a unit sends message to websocket to remove from DB + forward msgJson
-@param e click event from clicking the X of a unit */
+
+/** function to delete a unit sends message to websocket to remove from DB + forward msgJson
+ *@param e click event from clicking the X of a unit
+ */
 function deleteUnit(e) {
   let eleToDelete = this.parentNode // the unit box
   eleToDelete.remove();
@@ -100,17 +115,17 @@ function deleteUnit(e) {
   const unit = document.getElementById('currentUnitId').textContent; // find unit id
 
   // send Delete event to server
-  ws.send(JSON.stringify({'method': 'delete', 'element': delId, 'type': 'unit', 'unit': unit}));
-}
-/* remoce and element by its id
-@param eleId id of an element */
-function deleteElement(eleID) {
-  document.getElementById(eleID).remove();
+  ws.send(JSON.stringify({
+    'method': 'delete',
+    'element': delId,
+    'type': 'unit',
+    'unit': unit
+  }));
 }
 
-/* send request for a unit's contents then call function to put in page
+/** send request for a unit's contents then call function to put in page
  * @param e click even on an unit box
-*/
+ */
 async function unitClickHandler(e) {
   const unitId = this.parentNode.querySelector('.hidden').textContent;
   // change values in current unit boxes
@@ -123,7 +138,7 @@ async function unitClickHandler(e) {
 }
 /* put the json of a unit's content in the pages
  * @param content json object containing the weeks of a unit and the resources of those weeks
-*/
+ */
 function putUnitContentInPage(content) {
   // delete old weeks
   let delWeeks = document.querySelectorAll('.week')
@@ -171,18 +186,23 @@ function putUnitContentInPage(content) {
   }
 
 }
-
+/**
+ * function to create yes no boxes after clicking to delete a weeks
+ *@param e click event from clicking an X of a week
+ */
 function deleteWeek(e) {
   console.log("delete event start")
   selectedEle = this;
-
+  // container
   let confirmBoxContain = document.createElement("section");
   confirmBoxContain.setAttribute("class", "decisonContainer");
 
+  // yes box
   let yesBox = document.createElement("p");
   yesBox.innerText = "yes"
   yesBox.setAttribute("class", "decisonBox");
 
+  //no box
   let noBox = document.createElement("p");
   noBox.innerText = "no"
   noBox.setAttribute("class", "decisonBox");
@@ -198,6 +218,11 @@ function deleteWeek(e) {
   selectedEle.removeEventListener('click', deleteWeek);
 }
 
+/**
+ * function to create input boxes after clicking to add a week
+ *@param e click event from clicking a + button of a week
+ */
+
 function addWeekInputs(e) {
 
   console.log("add week event started");
@@ -208,6 +233,7 @@ function addWeekInputs(e) {
   weekToAddTo.innerText = this.parentNode.id; // gets the week
   weekToAddTo.setAttribute('id', "weekAdd");
 
+  // title of week input
   let weekTitleBox = document.createElement('input');
   weekTitleBox.type = "text";
   weekTitleBox.innerText = "week title";
@@ -223,6 +249,8 @@ function addWeekInputs(e) {
   durationBox.type = "number";
   durationBox.innerText = "duration";
   durationBox.setAttribute('id', "duration");
+
+  // save and cancel buttons
 
   let saveBox = document.createElement('p')
   saveBox.classList.add('save');
@@ -248,8 +276,17 @@ function addWeekInputs(e) {
 
 }
 
+/**
+ *function to add the week to the page, called after reciving save week message from webSocket
+ *@param prevEle the id of the element above where the new week would be
+ *@param title the string title of the week
+ *@param duration integer for the duration of the week
+ *@param weekId the id of the week that is being added to the page
+ */
+
 function addWeekToPage(prevEle, title, duration, weekId) {
 
+  // use template and add lisnters (clicks and drops)
   const template = document.querySelector('#week_t');
   const newEl = document.importNode(template.content, true).children[0];
 
@@ -271,9 +308,11 @@ function addWeekToPage(prevEle, title, duration, weekId) {
   const newId = "week" + weekId;
   newEl.setAttribute('id', weekId);
 
+  // append after the week that had the + clicked
   document.getElementById(prevEle).insertAdjacentElement('afterEnd', newEl);
   // do something with duration
 
+  // temp week only exists if its the only week
   if (prevEle == "tempWeek") {
     document.getElementById("tempWeek").remove();
   }
@@ -281,11 +320,22 @@ function addWeekToPage(prevEle, title, duration, weekId) {
   updatePositon(newEl, "add");
 }
 
+
+/**
+ *function to get all the resouces of a week from the Server
+ *@param eleToAppend the id of the week that resources are being added to
+ */
+
 async function getResources(eleToAppend) {
   let resources = await fetch('/resources/?weekId=' + eleToAppend);
   putResourcesInPage(eleToAppend, await resources.json());
 
 }
+/**
+ *function to append the resources from the server to a weeks
+ *@param eleToAppend id of the week that is being appended to
+ *@param resources json object containg the values of the resouces, i.e file names and ids
+ */
 function putResourcesInPage(eleToAppend, resources) {
   // delete old resources
   let ulToAppend = document.getElementById("week" + eleToAppend).querySelector('ul');
@@ -297,6 +347,7 @@ function putResourcesInPage(eleToAppend, resources) {
   dropHelper.innerText = "Drop resources here!";
   ulToAppend.appendChild(dropHelper);
 
+  // loop through json and make element for each
   for (let i = 0; i < resources.length; i++) {
     const newResc = document.createElement('li');
     newResc.classList.add('resource');
@@ -304,15 +355,21 @@ function putResourcesInPage(eleToAppend, resources) {
     const newRescA = document.createElement('a');
     newRescA.innerText = resources[i].fileName;
 
+    // refrences files in the resources folder
     newRescA.setAttribute('href', "/resources/" + resources[i].fileName);
+    // when clicking will download file
     newRescA.download = "/resources/" + resources[i].fileName;
     newResc.appendChild(newRescA);
-    // newRescA.setAttribute('download',"/resources/" + resources[i].file);
+
 
     ulToAppend.appendChild(newResc);
   }
 
 }
+/**
+ *function to send save message to websocket after cliking the save buttons
+ *@param e click event from clicking on the save buttton
+ */
 
 function saveHandler(e) {
   // get content from boxes
@@ -320,6 +377,7 @@ function saveHandler(e) {
   let title = document.getElementById('titleBox').value;
   let duration = document.getElementById('duration').value;
   let unit = document.getElementById('currentUnitId').textContent;
+  // send save week message to WS using pulled values
   ws.send(JSON.stringify({
     'method': 'save',
     'type': 'week',
@@ -328,20 +386,28 @@ function saveHandler(e) {
     'duration': duration,
     'unit': unit
   }));
-
+  // remove input boxes after save
   document.getElementById('addWeekBox').remove();
-  // re-add the event listener to the + button
+  // re-add the event listener to the + button, was removed to prevent double save
   document.getElementById(weekToAddTo.innerText).querySelector('.add').addEventListener('click', addWeekInputs);
 
 }
-
-// after clicking cancel the box is removed
+/**
+ *function to remove the add week box after clicking cancelBox
+ *@param e click event called after clicking the cancel button
+ */
 function cancelHandler(e) {
   document.getElementById('addWeekBox').remove();
 }
 
+/**
+ *function that handles clicks on the 'are you sure?' box when attempting to delete something, if yes send delete message to WS else delete the yes/no boxes
+ *@param e click event on either the yes button or no button of the are you sure box
+ */
+
 function yesNoHandler(e) {
   selectedEle = this;
+  // 1st element outside of the yes/no that was added
   let elementToDelete = selectedEle.parentNode.parentNode;
   let type = "";
   let delId = "";
@@ -352,6 +418,7 @@ function yesNoHandler(e) {
     type = "resource";
     delId = elementToDelete.getAttribute('id').slice(8); // remove resource part from id e.g resource24 -> 24
   }
+  // find what unit the week was a part of
   const unit = document.getElementById('currentUnitId').textContent;
   if (selectedEle.innerText == "yes") {
     if (elementToDelete.classList.contains("week")) {
@@ -359,8 +426,12 @@ function yesNoHandler(e) {
       updatePositon(elementToDelete, "delete");
     }
     // tell server to delete
-
-    ws.send(JSON.stringify({'method': 'delete', 'element': delId, 'type': type, 'unit': unit}));
+    ws.send(JSON.stringify({
+      'method': 'delete',
+      'element': delId,
+      'type': type,
+      'unit': unit
+    }));
   } else {
     // delete the yes / no box
     elementToDelete.querySelector(".delete").addEventListener('click', deleteWeek); // readd event listner to delete button
@@ -368,30 +439,35 @@ function yesNoHandler(e) {
 
   }
 }
+/**
+ *function that handles messages from the server by calling other functions
+ *@param e message recived from websocket event
+ */
 
-async function recivedMessageFromServer(e) {
-
+function recivedMessageFromServer(e) {
+  // read json sent from server
   const recived = JSON.parse(e.data);
-  console.log(recived);
-
+  // if want to save a unit
   if (recived.type == "unit" && recived.method == "save") {
-    const newUnitJson = [
-      {
-        'unitName': recived.title,
-        'unitId': recived.unitId
-      }
-    ]
+    const newUnitJson = [{
+      'unitName': recived.title,
+      'unitId': recived.unitId
+    }]
     putUnitsInPage(newUnitJson);
   }
 
-  // prevent adding to wrong pages
+  // prevent adding to wrong pages, by checking what unit page you are on
 
   if (recived.unit == document.getElementById('currentUnitId').textContent) {
 
+    // if deleting
     if (recived.method == "delete" && recived.type != "unit") {
-      deleteElement(recived.element);
+      document.getElementById(recived.element).remove();
+
+
+
+      // if saving
     } else if (recived.method == "save") {
-      console.log(recived);
       if (recived.type == "week") {
         addWeekToPage(recived.element, recived.title, recived.duration, recived.weekId);
         console.log(recived);
@@ -404,19 +480,24 @@ async function recivedMessageFromServer(e) {
   }
 }
 
-// type can be moved/added/deleted
+
+/**
+ *function update the position of a week after adding/deleting/moving by sending message to WS
+ *@param week the element of the week that has been operated on
+ *@param type string syaying what type of update needs to be carried out i.e week moved / week  added / week deleted
+ */
 function updatePositon(week, type) {
-  let weeksList = document.getElementById('weeks').children;
+  let weeksList = document.getElementById('weeks').children; // all the weeks
   let weekId = week.id.slice(4); // remove weekpart of id e.g week24 -> 24
   let newPos = 0;
   const unitId = document.getElementById('currentUnitId').textContent;
+  // loop though weeks to find where the week is now
   for (newPos; newPos < weeksList.length; newPos++) {
     if (weeksList[newPos] == week) {
       break;
     }
 
   }
-
   // send to msg server to tell new pos + update pos of ones below
   ws.send(JSON.stringify({
     'method': 'position',
@@ -427,7 +508,6 @@ function updatePositon(week, type) {
   }));
 }
 
-let selectedEle = null;
 
 /*
 
@@ -436,7 +516,12 @@ let selectedEle = null;
 
 
 */
+let selectedEle = null;
 
+/**
+ *function that handles drag start
+ *@param e dragstart event
+ */
 function handleDragStart(e) {
   selectedEle = this;
   e.dataTransfer.effectAllowed = 'move';
@@ -444,47 +529,62 @@ function handleDragStart(e) {
   this.classList.add('dragElem')
 
 }
+/**
+ *function that handles dragging over a drop zone
+ *@param e dragOver event
+ */
 function handleDragOver(e) {
   if (e.preventDefault) {
     e.preventDefault();
   }
+  // change the class to make it clear to drop
   this.classList.add('over');
 
   e.dataTransfer.dropEffect = 'move';
   return false;
 
 }
+/**
+ *function that removes the class over when no longer over the zone
+ *@param e dragleave event
+ */
 function handleDragLeave(e) {
   this.classList.remove('over');
 
 }
 
+/**
+ *function that handles dropping of weeks within the week block area
+ *@param e drop event
+ */
 function handleDrop(e) {
-  if (e.dataTransfer.files.length > 0)
-    return;
+  // prevent dropping of files
+  if (e.dataTransfer.files.length > 0) return;
   if (e.stopPropagation) {
     e.stopPropagation();
   }
-  // only works if a week is being dropped
+  // only works if a different week is being dropped
   if (selectedEle != this) {
     this.parentNode.removeChild(selectedEle)
+    // transfer all the html
     let dropHTML = e.dataTransfer.getData('text/html');
     this.insertAdjacentHTML('beforeBegin', dropHTML);
     let dropElem = this.previousSibling;
     let innerDeletes = dropElem.getElementsByClassName('delete');
-    // readd event listners
+    // readd delete event listners
     for (let i = 0; i < innerDeletes.length; i++) {
       innerDeletes[i].addEventListener('click', deleteWeek);
     }
 
     let innerAdds = dropElem.getElementsByClassName('add');
-    // readd event listners
+    // readd add event listners
     for (let i = 0; i < innerAdds.length; i++) {
       innerAdds[i].addEventListener('click', addWeekInputs);
     }
+    // readd week drag and drop listners
     addDragDropHandlers(dropElem);
 
-    // function to update positions of elements in DB
+    //update positions of elements in DB
     updatePositon(dropElem, "moved");
 
   }
@@ -492,13 +592,21 @@ function handleDrop(e) {
   return false;
 
 }
-
+/**
+ *function that removes the class over when the drag is over
+ *@param e dragend event
+ */
 function handleDragEnd(e) {
   this.classList.remove('over');
 
 }
+/**
+ *function to handle the dropping of files into the resource details section
+ *@param e drog even when dropping files into the correct section
+ */
 
 async function resourceDropHandler(e) {
+  // remove over class from the week
   this.parentNode.parentNode.classList.remove('over');
   // get the id of week being dropped into (remove week part of id e.g week24 ->24);
   const elementId = this.parentNode.parentNode.id.slice(4);
@@ -522,6 +630,10 @@ async function resourceDropHandler(e) {
   }
 
 }
+/**
+ *function to add all the drag and drop handlers to weeks
+ *@param elem week element
+ */
 
 function addDragDropHandlers(elem) {
   elem.addEventListener('dragstart', handleDragStart, false);
