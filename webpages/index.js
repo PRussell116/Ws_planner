@@ -127,6 +127,11 @@ function deleteUnit(e) {
  * @param e click even on an unit box
  */
 async function unitClickHandler(e) {
+  // remove possible inputbox
+  const addWeekBox = document.getElementById('addWeekBox')
+  if(addWeekBox != null) addWeekBox.remove();
+
+
   const unitId = this.parentNode.querySelector('.hidden').textContent;
   // change values in current unit boxes
   document.getElementById('currentUnitId').textContent = unitId;
@@ -196,15 +201,16 @@ function deleteWeek(e) {
   // container
   let confirmBoxContain = document.createElement("section");
   confirmBoxContain.setAttribute("class", "decisonContainer");
+  confirmBoxContain.innerText = "Are you sure you want to delete this?"
 
   // yes box
   let yesBox = document.createElement("p");
-  yesBox.innerText = "yes"
+  yesBox.innerText = "Yes"
   yesBox.setAttribute("class", "decisonBox");
 
   //no box
   let noBox = document.createElement("p");
-  noBox.innerText = "no"
+  noBox.innerText = "No"
   noBox.setAttribute("class", "decisonBox");
 
   confirmBoxContain.appendChild(yesBox);
@@ -247,6 +253,7 @@ function addWeekInputs(e) {
 
   let durationBox = document.createElement('input');
   durationBox.type = "number";
+  durationBox.min = "1";
   durationBox.innerText = "duration";
   durationBox.setAttribute('id', "duration");
 
@@ -397,6 +404,11 @@ function saveHandler(e) {
  *@param e click event called after clicking the cancel button
  */
 function cancelHandler(e) {
+  // readd listner to +
+  let week = document.getElementById('weekAdd').innerText;
+  document.getElementById(week).querySelector('.add').addEventListener('click',addWeekInputs);
+
+
   document.getElementById('addWeekBox').remove();
 }
 
@@ -420,7 +432,7 @@ function yesNoHandler(e) {
   }
   // find what unit the week was a part of
   const unit = document.getElementById('currentUnitId').textContent;
-  if (selectedEle.innerText == "yes") {
+  if (selectedEle.innerText == "Yes") {
     if (elementToDelete.classList.contains("week")) {
       // tell server to update positions
       updatePositon(elementToDelete, "delete");

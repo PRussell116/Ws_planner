@@ -8,47 +8,66 @@
 </head>
 
 <body>
-  <nav>
+  <nav role = Navigation>
     <ul id="unitsBar">
-      <li><a id='unitAdd'>+</a></li>
+      <li><a id='unitAdd' role = Button>+</a></li>
 
     </ul>
 
   </nav>
-  <div class="wrapper">
-    <div class="unitBlock">
+  <div class="wrapper" role = Grid>
+    <div class="unitBlock" role = GridCell>
       <article>
         <p id='currentUnit'></p>
-        <p id='currentUnitId' class='hidden'></p>
-
+        <p id='currentUnitId' class='hidden' aria-hidden="true"></p>
       </article>
+
+
       <ol id="weeks">
+        <li class = 'week'>
+          <article class = "welcomeArticle">
+            <p>Welcome to Ws_planner</p>
+            <p>To add a unit click the green plus above</p>
+            <p>To view a unit click one of the links above</p>
+            <p>
+              <ul class = 'features'>Features of Ws_planner
+                <li>Creatation and deletion of units</li>
+                <li>Creatation and deletion of weeks</li>
+                <li>Collaborative editing through the use of websockets</li>
+                <li>Drag and drop to reorder weeks</li>
+                <li>Drag and drop to upload files to a week</li>
+              </ul>
+            </p>
+          </article>
+        </li>
 
       </ol>
     </div>
   </div>
+
+
   <template id="week_t">
       <li class = 'week' draggable= "true" id = "error">
-          <details id = "error" data-memostate = "open">
+          <details id = "error" data-memostate = "open" role = ListItem>
             <summary>error</summary>
             <ul id = "resourceUL">
               <li class = 'resource' draggable="true" id = "error">
-                sdkjslkdjsalkdjalskjdlkasjdlkasjdlkajdlkjalkdjaslkdjaslkdjl
-                <a class = 'delete'>X</a>
+                Drop resources here!
+                <a class = 'delete' role = Button>X</a>
               </li>
             </ul>
           </details>
-          <a class = "delete">X</a>
-          <a class = "add">+</a>
+          <a class = "delete" role = Button>X</a>
+          <a class = "add" role = Button>+</a>
       </li>
     </template>
 
   <template id="unit_t">
       <li class = "unit">
 
-        <a class = "unitLink"></a>
-        <a class = "delete">X</a>
-        <p class = "hidden"> </p>
+        <a class = "unitLink" role = Button></a>
+        <a class = "delete" role = Button>X</a>
+        <p class = "hidden" aria-hidden="true"</aria-hi>> </p>
 
       </li>
     </template>
@@ -59,8 +78,8 @@
     <li>
      <article>
        <input type = "text" placeholder = "Enter name of unit"></input>
-       <p class = 'save'>Save</p>
-       <p class = 'cancel'>Cancel</p>
+       <p class = 'save' role = Button>Save</p>
+       <p class = 'cancel' role = Button>Cancel</p>
      </article>
    </li>
    </template>

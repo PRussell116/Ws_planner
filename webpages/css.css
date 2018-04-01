@@ -61,8 +61,9 @@ li:hover>.delete {
   transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
 }
 
-.save {
+.save, .cancel {
   border-style: solid;
+  cursor: pointer;
 }
 
 .hidden {
@@ -204,26 +205,56 @@ details[open] summary {
   background-color: #9ec3ff;
 }
 
-.decisonBoxContainer {
+.decisonContainer {
   display: flex;
-  flex-drection: row;
+  flex-direction: row;
+  justify-content:space-between;
+  flex-wrap: wrap;
   border-style: solid;
+  border-color: red;
   /*  overflow: hidden;*/
 }
 
 .decisonBox {
-  flex: auto;
-  /*border-style: solid;
-  padding:none;
-  margin: none;
-  font-size: 1em;
-  text-align: center;
-  width: 25%*/
+  flex: 1;
+  padding: 2em;
+  cursor: pointer;
+
 }
 
-/*.left{
-  float: left;
+#addWeekBox{
+  display: grid;
+  grid-gap: 2em;
+  grid-template-columns: repeat(2,5em);
+  grid-template-rows: repeat(4, 5em);
+  justify-content: center;
+  align-content: end;
+
 }
-.right{
-  float: right;
-}*/
+#addWeekBox > #weekAdd{
+  grid-column: 1/3;
+}
+
+#titleBox, #duration{
+  align-self: center;
+  height: 3.2em;
+  width: 6em;
+}
+
+.welcomeArticle > p{
+  background-color: inherit;
+  padding:1em;
+}
+
+.features{
+  list-style:outside;
+
+}
+.features>li{
+  padding:1em;
+}
+/*
+#addWeekBox > p ,#addWeekBox > input {
+  grid-column: 1/2;
+  grid-column: 2/4;
+} */
