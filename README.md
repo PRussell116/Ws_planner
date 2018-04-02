@@ -107,8 +107,6 @@ I also learnt about the use of html5 templates, they saved me alot of time and c
 I learnt about them a little late into the project so not all of my functions that create elements use them, with a little more time
 I would rewrite those functions that do not use them as it would improve code readability by quite alot
 
-```
-Give an example
-```
+
 
 
