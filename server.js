@@ -56,6 +56,13 @@ async function messageHandler(message, res) {
 
 
   let msgJson = JSON.parse(message);
+
+  /*
+
+    Deletion
+
+
+  */
   if (msgJson.method == 'delete') {
     // remove unit from DB
     if (msgJson.type == 'unit') {
@@ -89,6 +96,21 @@ async function messageHandler(message, res) {
       });
 
     }
+
+
+
+    /*
+
+      Saving
+
+
+
+
+
+    */
+
+
+
   } else if (msgJson.method == 'save') {
     // add to DB
     if (msgJson.type == "unit") {
@@ -125,7 +147,17 @@ async function messageHandler(message, res) {
         'weekId': newId
       });
     }
-    // called from moving
+
+
+    /*
+
+
+    positioning (moving a week)
+
+
+
+
+    */
   } else if (msgJson.method == 'position') {
     if (msgJson.type == "moved" || msgJson.type == "add") {
       // +1 position to all records after
@@ -137,6 +169,13 @@ async function messageHandler(message, res) {
       await sql.query('UPDATE Week SET positon = positon - 1 WHERE positon >=   \"' + msgJson.positon + "\" AND unitId = " + msgJson.unitId);
     }
   }
+
+  /*
+
+  send message for all above ifs
+
+*/
+
   // forward message to clients to adjust their page
   wss.clients.forEach((client) => {
     if (client.readyState === client.OPEN) {
@@ -274,6 +313,7 @@ app.get('/unit', loadUnits);
 app.get('/unitContent', getUnitContent);
 app.get('/resources', getResources);
 
+// ip of vm changes
 server.listen(port, () => {
   console.log('Server started:', `http://${ip.address()}:${port}`)
 });
