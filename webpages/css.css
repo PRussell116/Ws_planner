@@ -61,6 +61,11 @@ li:hover>.delete {
   transition: opacity 0.3s 0.5s, visibility 0s 0.3s;
 }
 
+.rescDele{
+  position: relative;
+  display: inline;
+}
+
 .save, .cancel {
   border-style: solid;
   cursor: pointer;

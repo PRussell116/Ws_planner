@@ -51,6 +51,7 @@ function connectionHandler(ws) {
 
 */
 async function messageHandler(message, res) {
+  console.log(message);
   const sql = await connection;
 
 
@@ -73,12 +74,18 @@ async function messageHandler(message, res) {
       });
 
     } else if (msgJson.type == 'resource') {
+
+      // remove from file system
+      await fs.unlinkAsync(`${__dirname}/webpages/resources/` + msgJson.fileName);
       // remove from DB by Id
-      //      await sql.query('DELETE FROM weekResources WHERE   resourceId = ' + msgJson.element);
+      await sql.query('DELETE FROM WeekResources WHERE   resourceId = ' + msgJson.element);
+
       const eleId = "resource" + msgJson.element; // readd the resource part of element to delete from page
-      message = ({
+      message = JSON.stringify({
         'method': 'delete',
-        'element': eleId
+        'type': 'resource',
+        'element': eleId,
+        'unit': msgJson.unit
       });
 
     }

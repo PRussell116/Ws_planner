@@ -129,7 +129,7 @@ function deleteUnit(e) {
 async function unitClickHandler(e) {
   // remove possible inputbox
   const addWeekBox = document.getElementById('addWeekBox')
-  if(addWeekBox != null) addWeekBox.remove();
+  if (addWeekBox != null) addWeekBox.remove();
 
 
   const unitId = this.parentNode.querySelector('.hidden').textContent;
@@ -368,6 +368,15 @@ function putResourcesInPage(eleToAppend, resources) {
     newRescA.download = "/resources/" + resources[i].fileName;
     newResc.appendChild(newRescA);
 
+    newResc.id = "resource" + resources[i].resourceId;
+
+    const delBut = document.createElement('a');
+    delBut.classList.add('delete');
+    delBut.classList.add('rescDele');
+    delBut.addEventListener('click', deleteWeek);
+    delBut.innerText = "X";
+    newResc.appendChild(delBut);
+
 
     ulToAppend.appendChild(newResc);
   }
@@ -406,7 +415,7 @@ function saveHandler(e) {
 function cancelHandler(e) {
   // readd listner to +
   let week = document.getElementById('weekAdd').innerText;
-  document.getElementById(week).querySelector('.add').addEventListener('click',addWeekInputs);
+  document.getElementById(week).querySelector('.add').addEventListener('click', addWeekInputs);
 
 
   document.getElementById('addWeekBox').remove();
@@ -423,12 +432,14 @@ function yesNoHandler(e) {
   let elementToDelete = selectedEle.parentNode.parentNode;
   let type = "";
   let delId = "";
+  let fileName = "";
   if (elementToDelete.classList.contains("week")) {
     type = "week";
     delId = elementToDelete.getAttribute('id').slice(4); // remove week part from id e.g week24 -> 24
   } else if (elementToDelete.classList.contains("resource")) {
     type = "resource";
     delId = elementToDelete.getAttribute('id').slice(8); // remove resource part from id e.g resource24 -> 24
+    fileName = selectedEle.parentNode.parentNode.querySelector('a').innerText; // get text from the a containing file name
   }
   // find what unit the week was a part of
   const unit = document.getElementById('currentUnitId').textContent;
@@ -442,7 +453,8 @@ function yesNoHandler(e) {
       'method': 'delete',
       'element': delId,
       'type': type,
-      'unit': unit
+      'unit': unit,
+      'fileName': fileName
     }));
   } else {
     // delete the yes / no box
@@ -457,8 +469,10 @@ function yesNoHandler(e) {
  */
 
 function recivedMessageFromServer(e) {
+
   // read json sent from server
   const recived = JSON.parse(e.data);
+
   // if want to save a unit
   if (recived.type == "unit" && recived.method == "save") {
     const newUnitJson = [{
