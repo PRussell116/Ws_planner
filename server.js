@@ -64,13 +64,13 @@ async function messageHandler(message, res) {
 
   */
   if (msgJson.method == 'delete') {
-    // remove unit from DB
+    // remove unit from DB (delete on cascade removes weeks connected by forigen key)
     if (msgJson.type == 'unit') {
       // delete the unit (forigen key data items deleted aswell due to cascade delete)
       await sql.query('DELETE FROM Unit WHERE unitId = ' + msgJson.element);
 
     } else if (msgJson.type == 'week') {
-      // remove from DB by Id
+      // remove from DB by Id  (delete on cascade removes resources connected by forigen key)
       await sql.query('DELETE FROM Week WHERE weekID = ' + msgJson.element);
       const eleId = "week" + msgJson.element; // readd the week part of element to delete from page
 
